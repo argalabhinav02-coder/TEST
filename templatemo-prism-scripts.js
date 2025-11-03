@@ -14,50 +14,50 @@ https://templatemo.com/tm-600-prism-flux
         const portfolioData = [
             {
                 id: 1,
-                title: 'Neural Network',
-                description: 'Advanced AI system with deep learning capabilities for predictive analytics and pattern recognition.',
+                title: 'Youngest Pic of Mine',
+                description: 'When I Go First Time At School. This Is The FIrst Picture I Clicked',
                 image: 'images/neural-network.jpg',
                 tech: ['TensorFlow', 'Python', 'CUDA']
             },
             {
                 id: 2,
-                title: 'Quantum Cloud',
-                description: 'Next-generation cloud infrastructure leveraging quantum computing for unprecedented processing power.',
+                title: 'The Cutest Pic of Mine',
+                description: 'This Is a Photo When I Go To An Restaurent.',
                 image: 'images/quantum-cloud.jpg',
                 tech: ['AWS', 'Kubernetes', 'Docker']
             },
             {
                 id: 3,
-                title: 'Blockchain Vault',
-                description: 'Secure decentralized storage solution using advanced encryption and distributed ledger technology.',
+                title: 'Orchha Fort',
+                description: 'This is the Same Fort Which is Shooted in a Bollywood Movie, Bhool Bhuliayaa 3.',
                 image: 'images/blockchain-vault.jpg',
                 tech: ['Ethereum', 'Solidity', 'Web3']
             },
             {
                 id: 4,
-                title: 'Cyber Defense',
-                description: 'Military-grade cybersecurity framework with real-time threat detection and automated response.',
+                title: 'A Beutiful Sunset',
+                description: 'A Beutiful Sunset at my Village.',
                 image: 'images/cyber-defense.jpg',
                 tech: ['Zero Trust', 'AI Defense', 'Encryption']
             },
             {
                 id: 5,
-                title: 'Data Nexus',
-                description: 'Big data processing platform capable of analyzing petabytes of information in real-time.',
+                title: 'Pic of My Younger Brother',
+                description: 'Also a Beutiful Picture at my Village..',
                 image: 'images/data-nexus.jpg',
                 tech: ['Apache Spark', 'Hadoop', 'Kafka']
             },
             {
                 id: 6,
-                title: 'AR Interface',
-                description: 'Augmented reality system for immersive data visualization and interactive experiences.',
+                title: 'I Brought a New Shirt And Then Clicked This Photo',
+                description: 'Because there was my Birthday so I Brought a New Shirt And Then Clicked This Photo.',
                 image: 'images/ar-interface.jpg',
                 tech: ['Unity', 'ARCore', 'Computer Vision']
             },
             {
                 id: 7,
-                title: 'IoT Matrix',
-                description: 'Intelligent IoT ecosystem connecting millions of devices with edge computing capabilities.',
+                title: 'Very Tremendous Picture',
+                description: 'This is a Picture I Clicked At Jabalpur, The Vally is really So Deep, Very Tremendous Picture.',
                 image: 'images/iot-matrix.jpg',
                 tech: ['MQTT', 'Edge AI', '5G']
             }
@@ -480,4 +480,5 @@ https://templatemo.com/tm-600-prism-flux
             if (parallax) {
                 parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
             }
+
         });
