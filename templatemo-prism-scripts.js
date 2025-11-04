@@ -17,49 +17,49 @@ https://templatemo.com/tm-600-prism-flux
                 title: 'Youngest Pic of Mine',
                 description: 'When I Go First Time At School. This Is The FIrst Picture I Clicked',
                 image: 'images/neural-network.jpg',
-                tech: ['TensorFlow', 'Python', 'CUDA']
+                
             },
             {
                 id: 2,
                 title: 'The Cutest Pic of Mine',
                 description: 'This Is a Photo When I Go To An Restaurent.',
                 image: 'images/quantum-cloud.jpg',
-                tech: ['AWS', 'Kubernetes', 'Docker']
+                
             },
             {
                 id: 3,
                 title: 'Orchha Fort',
                 description: 'This is the Same Fort Which is Shooted in a Bollywood Movie, Bhool Bhuliayaa 3.',
                 image: 'images/blockchain-vault.jpg',
-                tech: ['Ethereum', 'Solidity', 'Web3']
+                
             },
             {
                 id: 4,
                 title: 'A Beutiful Sunset',
                 description: 'A Beutiful Sunset at my Village.',
                 image: 'images/cyber-defense.jpg',
-                tech: ['Zero Trust', 'AI Defense', 'Encryption']
+                
             },
             {
                 id: 5,
                 title: 'Pic of My Younger Brother',
                 description: 'Also a Beutiful Picture at my Village..',
                 image: 'images/data-nexus.jpg',
-                tech: ['Apache Spark', 'Hadoop', 'Kafka']
+                
             },
             {
                 id: 6,
                 title: 'I Brought a New Shirt And Then Clicked This Photo',
                 description: 'Because there was my Birthday so I Brought a New Shirt And Then Clicked This Photo.',
                 image: 'images/ar-interface.jpg',
-                tech: ['Unity', 'ARCore', 'Computer Vision']
+                
             },
             {
                 id: 7,
                 title: 'Very Tremendous Picture',
                 description: 'This is a Picture I Clicked At Jabalpur, The Vally is really So Deep, Very Tremendous Picture.',
                 image: 'images/iot-matrix.jpg',
-                tech: ['MQTT', 'Edge AI', '5G']
+                
             }
         ];
 
@@ -141,7 +141,7 @@ https://templatemo.com/tm-600-prism-flux
                     <h3 class="card-title">${data.title}</h3>
                     <p class="card-description">${data.description}</p>
                     <div class="card-tech">${techBadges}</div>
-                    <button class="card-cta" onclick="scrollToSection('about')">Explore</button>
+                    
                 </div>
             `;
             
@@ -482,3 +482,4 @@ https://templatemo.com/tm-600-prism-flux
             }
 
         });
+
