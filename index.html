@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Museum of Memories</title>
+
+<!-- Favicon -->
+   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="icon" href="favicon.ico">
+
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-color: #0f0f0f;
+            --section-bg: #181818;
+            --text-color: #e0e0e0;
+            --accent-color: #d4af37;
+            --card-border: #333;
+            --font-main: 'Georgia', serif;
+            --font-sans: 'Inter', sans-serif;
+            --transition: 0.4s ease;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 40px;
+            color: var(--accent-color);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 2.4rem;
+        }
+        h2 {
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Breadcrumbs */
+        #breadcrumbs {
+            margin: 20px auto 10px;
+            font-family: var(--font-sans);
+            color: #888;
+            cursor: pointer;
+            width: max-content;
+            transition: var(--transition);
+        }
+        #breadcrumbs:hover {
+            color: var(--accent-color);
+        }
+
+        /* Containers */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .active-view {
+            display: block;
+        }
+
+        /* Grid layouts */
+        .year-grid, .event-grid, .photo-grid {
+            display: grid;
+            gap: 22px;
+        }
+
+        .year-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+        .event-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        .photo-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+        /* Cards */
+        .card {
+            background: var(--section-bg);
+            padding: 22px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Photos */
+        .photo-thumb {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .photo-thumb:hover {
+            border-color: var(--accent-color);
+            opacity: 0.85;
+        }
+
+        /* Lightbox */
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 85%;
+            border: 2px solid var(--accent-color);
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .fade-in {
+            opacity: 1 !important;
+        }
+
+        #close-btn {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            font-size: 45px;
+            cursor: pointer;
+            color: white;
+            font-family: var(--font-sans);
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: #999;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+/* ---- Mini Preview Slideshow ---- */
+.event-preview {
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.event-preview img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+.event-preview img.active {
+    opacity: 1;
+}
+
+    </style>
+</head>
+
+<body>
+
+<h1>Museum of Memories</h1>
+<div id="breadcrumbs" onclick="goHome()">Select a Year</div>
+
+<div id="view-years" class="container active-view">
+    <h2>Select a Year</h2>
+    <div id="year-list" class="year-grid"></div>
+</div>
+
+<div id="view-events" class="container">
+    <h2 id="selected-year-title"></h2>
+    <div id="event-list" class="event-grid"></div>
+</div>
+
+<div id="view-gallery" class="container">
+    <h2 id="selected-event-title"></h2>
+    <div id="photo-list" class="photo-grid"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+    <span id="close-btn" onclick="closeLightbox()">&times;</span>
+    <img id="lightbox-img">
+    <div id="controls">Slideshow Active (3s) — Space: Pause/Play — ←/→ when paused</div>
+</div>
+
+<script>
+
+    /* ---------------- DATABASE ---------------- */
+    const database = {
+
+	1998: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	1999: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2000: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2001: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2002: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2003: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2004: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2005: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2006: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2007: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2008: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2009: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2010: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2011: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2012: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2013: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2014: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2015: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2016: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2017: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2018: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2019: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2020: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+	2021: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+
+	2022: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+
+	2023: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+
+        2024: {
+            "Trip to Paris": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ],
+            "Graduation": [
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        },
+        2025: {
+            "New Year Party": [
+                "images/2024/Birthday/1.jpg",
+                "images/2024/Birthday/2.jpg",
+                "images/2024/Birthday/3.jpg"
+            ]
+        }
+    };
+
+    for (let y = 1999; y <= 2025; y++) {
+        if (!database[y]) database[y] = {};
+    }
+
+    /* ---------------- STATE ---------------- */
+    let currentPhotos = [];
+    let slideIndex = 0;
+    let slideInterval;
+    let isPaused = false;
+
+    const viewYears = document.getElementById('view-years');
+    const viewEvents = document.getElementById('view-events');
+    const viewGallery = document.getElementById('view-gallery');
+
+    const yearList = document.getElementById('year-list');
+    const eventList = document.getElementById('event-list');
+    const photoList = document.getElementById('photo-list');
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    /* ---------------- INIT YEARS ---------------- */
+    function init() {
+        Object.keys(database).reverse().forEach(year => {
+            const eventCount = Object.keys(database[year]).length;
+            const card = document.createElement('div');
+            card.className = "card";
+
+            card.innerHTML = `
+                <h3>${year}</h3>
+                <small>${eventCount > 0 ? eventCount + " Events" : "No Data"}</small>
+            `;
+
+            if (eventCount > 0) {
+                card.onclick = () => showEvents(year);
+            } else {
+                card.style.opacity = "0.4";
+                card.style.cursor = "default";
+            }
+
+            yearList.appendChild(card);
+        });
+    }
+
+    /* ---------------- NAVIGATION ---------------- */
+
+    function showView(id) {
+        viewYears.classList.remove("active-view");
+        viewEvents.classList.remove("active-view");
+        viewGallery.classList.remove("active-view");
+        document.getElementById(id).classList.add("active-view");
+    }
+
+    function goHome() {
+        closeLightbox();
+        showView("view-years");
+        breadcrumbs.textContent = "Select a Year";
+    }
+
+    /* ---------------- SHOW EVENTS ---------------- */
+    function showEvents(year) {
+        document.getElementById("selected-year-title").textContent = "Events of " + year;
+        breadcrumbs.textContent = `Home > ${year}`;
+
+        eventList.innerHTML = "";
+        const events = database[year];
+
+        Object.keys(events).forEach(eventName => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <h3>${eventName}</h3>
+                <small>${events[eventName].length} Photos</small>
+            `;
+            card.onclick = () => showGallery(year, eventName);
+
+            eventList.appendChild(card);
+        });
+
+        showView("view-events");
+    }
+
+    /* ---------------- SHOW GALLERY ---------------- */
+    function showGallery(year, eventName) {
+        document.getElementById("selected-event-title").textContent = eventName;
+        breadcrumbs.textContent = `Home > ${year} > ${eventName}`;
+
+        currentPhotos = database[year][eventName];
+        photoList.innerHTML = "";
+
+        currentPhotos.forEach((src, index) => {
+            const img = document.createElement("img");
+            img.src = src;
+            img.className = "photo-thumb";
+            img.onclick = () => openSlideshow(index);
+            photoList.appendChild(img);
+        });
+
+        showView("view-gallery");
+    }
+
+    /* ---------------- SLIDESHOW ---------------- */
+
+    function openSlideshow(startIndex) {
+        slideIndex = startIndex;
+        isPaused = false;
+        lightbox.style.display = "flex";
+
+        startSlideshow();
+        showSlide();
+    }
+
+    function startSlideshow() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 3000);
+        isPaused = false;
+    }
+
+    function pauseSlideshow() {
+        clearInterval(slideInterval);
+        isPaused = true;
+    }
+
+    function showSlide() {
+        lightboxImg.classList.remove("fade-in");
+
+        setTimeout(() => {
+            lightboxImg.src = currentPhotos[slideIndex];
+            lightboxImg.onload = () => lightboxImg.classList.add("fade-in");
+        }, 150);
+    }
+
+    function nextSlide() {
+        slideIndex = (slideIndex + 1) % currentPhotos.length;
+        showSlide();
+    }
+
+    function prevSlide() {
+        slideIndex = (slideIndex - 1 + currentPhotos.length) % currentPhotos.length;
+        showSlide();
+    }
+
+    function closeLightbox() {
+        lightbox.style.display = "none";
+        clearInterval(slideInterval);
+        isPaused = false;
+    }
+
+    lightbox.onclick = (e) => {
+        if (e.target !== lightboxImg) closeLightbox();
+    };
+
+    /* ---------------- KEYBOARD CONTROL ---------------- */
+
+    document.addEventListener("keydown", e => {
+        if (lightbox.style.display !== "flex") return;
+
+        if (e.code === "Space") {
+            e.preventDefault();
+            isPaused ? startSlideshow() : pauseSlideshow();
+        }
+
+        if (isPaused) {
+            if (e.code === "ArrowRight") nextSlide();
+            if (e.code === "ArrowLeft") prevSlide();
+        }
+    });
+
+    init();
+
+</script>
+</body>
+</html>
