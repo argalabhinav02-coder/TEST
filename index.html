@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admission Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+     <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="icon" href="favicon.ico">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<style>
+body {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.form-card {
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.92);
+}
+
+.input {
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+}
+
+.btn-primary {
+  background: linear-gradient(to right, #6366f1, #8b5cf6);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.progress-bar {
+  background: linear-gradient(to right, #ff5e00, #ff0000ff);
+  transition: width 0.3s ease;
+}
+
+.form-step {
+  display: none;
+}
+.form-step.active {
+  display: block;
+}
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+<div class="form-card rounded-2xl shadow-2xl w-full max-w-4xl animate__animated animate__fadeIn">
+
+  <!-- Progress -->
+  <div class="bg-gray-200 h-2 rounded-t-2xl">
+    <div id="progress" class="progress-bar h-full rounded-t-2xl" style="width:50%"></div>
+  </div>
+
+  <div class="p-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Admission Form</h1>
+
+    <form id="admissionForm" novalidate>
+
+      <!-- STEP 1 -->
+      <div id="step-1" class="form-step active">
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">Personal Information</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <input id="Name" class="input" placeholder="Student Name *" required>
+          <input id="add" class="input" placeholder="Address *" required>
+          <input id="city" class="input" placeholder="City *" required>
+          <input id="phone" class="input" placeholder="Phone Number *" required>
+          <input id="dob" type="date" class="input" required>
+
+          <div>
+            <label class="block mb-2 font-medium text-gray-700">Gender *</label>
+            <label class="mr-6"><input type="radio" name="gender" value="Male" required> Male</label>
+            <label><input type="radio" name="gender" value="Female" required> Female</label>
+          </div>
+        </div>
+
+        <div class="text-right mt-8">
+          <button type="button" onclick="nextStep()" class="btn-primary text-white px-8 py-3 rounded-xl font-semibold">
+            Next →
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step-2" class="form-step">
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">Academic Information</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <select id="course" class="input" required>
+            <option value="">Select Course *</option>
+            <option>ABACUS</option>
+            <option>CPCT</option>
+            <option>DCA</option>
+            <option>PGDCA</option>
+            <option>TALLY PRIME</option>
+            <option>C</option>
+            <option>C++</option>
+            <option>PYTHON</option>
+            <option>OTHER</option>
+          </select>
+
+          <!-- NOT REQUIRED -->
+          <input id="other" class="input" placeholder="Other Course (Optional)">
+
+          <input id="qualification" class="input md:col-span-2" placeholder="Highest Qualification *" required>
+        </div>
+
+        <label class="block mt-6 text-sm">
+          <input type="checkbox" id="terms" required>
+          I agree to the terms and conditions *
+        </label>
+
+        <div class="flex justify-between mt-8">
+          <button type="button" onclick="prevStep()" class="px-8 py-3 rounded-xl border font-semibold">
+            ← Back
+          </button>
+
+          <button type="button" id="submitBtn" class="btn-primary text-white px-8 py-3 rounded-xl font-semibold">
+            Submit Application
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const scriptURL = "https://script.google.com/macros/s/AKfycbxgqzWJ3LCfX8XiTBz7wf5BWBPSOJ9UXngKtbY6WqQ-Y-Q6Aci1P0y8X_DburFC9o-0Mw/exec";
+const whatsappNumber = "918962087556"; // country code + number (NO +)
+
+/* ============== STEP CONTROL ============== */
+function nextStep() {
+  if (!validateStep1()) return;
+  document.getElementById("step-1").classList.remove("active");
+  document.getElementById("step-2").classList.add("active");
+  document.getElementById("progress").style.width = "100%";
+}
+
+function prevStep() {
+  document.getElementById("step-2").classList.remove("active");
+  document.getElementById("step-1").classList.add("active");
+  document.getElementById("progress").style.width = "50%";
+}
+
+/* ============== VALIDATION ============== */
+function validateStep1() {
+  const inputs = document.querySelectorAll("#step-1 [required]");
+  for (let input of inputs) {
+    if (input.type !== "radio" && !input.value.trim()) {
+      alert("Please fill all required fields");
+      return false;
+    }
+  }
+  if (!document.querySelector('input[name="gender"]:checked')) {
+    alert("Please select gender");
+    return false;
+  }
+  return true;
+}
+
+/* ============== SUBMIT ============== */
+document.getElementById("submitBtn").addEventListener("click", submitForm);
+
+function submitForm() {
+
+  if (!document.getElementById("terms").checked) {
+    alert("Please accept the terms and conditions");
+    return;
+  }
+
+  const data = {
+    Name: document.getElementById("Name").value.trim(),
+    Address: document.getElementById("add").value.trim(),
+    City: document.getElementById("city").value.trim(),
+    Phone: document.getElementById("phone").value.trim(),
+    DOB: document.getElementById("dob").value,
+    Gender: document.querySelector('input[name="gender"]:checked').value,
+    Course: document.getElementById("course").value,
+    Other: document.getElementById("other").value.trim(),
+    Qualification: document.getElementById("qualification").value.trim()
+  };
+
+  const formData = new FormData();
+  Object.keys(data).forEach(key => formData.append(key, data[key]));
+
+  fetch(scriptURL, {
+    method: "POST",
+    body: formData
+  })
+  .then(() => {
+  showSuccess();
+
+  setTimeout(() => {
+    sendWhatsApp(data);
+  }, 2000); // opens WhatsApp after animation
+
+  document.getElementById("admissionForm").reset();
+  prevStep();
+})
+
+  .catch(() => alert("Submission failed. Try again."));
+}
+
+/* ============== SUCCESS ANIMATION ============== */
+function showSuccess() {
+  const modal = document.getElementById("successModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  setTimeout(() => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }, 3000);
+}
+
+/* ============== WHATSAPP MESSAGE ============== */
+function sendWhatsApp(data) {
+  const message =
+`New Admission Form
+
+Name: ${data.Name}
+City: ${data.City}
+Phone: ${data.Phone}
+Course: ${data.Course}
+Qualification: ${data.Qualification}`;
+
+  const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
+</script>
+
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-2xl p-10 text-center animate__animated animate__zoomIn">
+    <div class="text-green-500 text-6xl mb-4">✔</div>
+    <h2 class="text-2xl font-bold mb-2">Submitted Successfully</h2>
+    <p class="text-gray-600">Your admission form has been sent.</p>
+  </div>
+</div>
+
+
+
+</body>
+</html>
