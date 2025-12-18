@@ -1,1 +1,23 @@
-https://docs.google.com/spreadsheets/d/1Iuj4PfoNGblID0mBKFCnW5io_tvx87a1LbIV1PLTrAc/edit?usp=sharing
+function doPost(e) {
+  const sheet = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getSheetByName("Sheet1");
+
+  sheet.appendRow([
+    new Date(),
+    e.parameter.Name,
+    e.parameter.Address,
+    e.parameter.City,
+    e.parameter.Phone,
+    e.parameter.DOB,
+    e.parameter.Gender,
+    e.parameter.Course,
+    e.parameter.Other,
+    e.parameter.Qualification
+  ]);
+
+  return ContentService
+    .createTextOutput("Success")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
