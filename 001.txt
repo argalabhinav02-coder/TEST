@@ -21,3 +21,4 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
+https://docs.google.com/spreadsheets/d/13HneB-FkDKJc5v5L6Cd7Zle5aG2kU5pgaZzQN7VsbWU/edit?usp=sharing
