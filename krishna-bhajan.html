@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIVA STUDIO - BHAJANS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">🎶 VIVA STUDIO</div>
+  <nav>
+    <a href="bhajan.html" class="back-btn">← Back</a>
+  </nav>
+
+  <!-- Mini Player in Navbar -->
+  <div id="navPlayer" class="nav-player">
+    <button id="backwardBtn">⏪ -10s</button>
+    <button id="playPauseBtn">▶</button>
+    <button id="forwardBtn">⏩ +10s</button>
+    <span id="currentTime">0:00</span>
+    <input type="range" id="progressBar" value="0">
+    <span id="duration">0:00</span>
+    <audio id="customAudio"></audio>
+  </div>
+</header>
+
+
+<h2 class="page-title">Personal</h2>
+
+<section class="song-grid">
+
+  <div class="song-card">
+  <div class="card-inner">
+
+    <!-- FRONT -->
+    <div class="card-front">
+      <img src="pexels-daniel-43199-158971.jpg" alt="Krishna Bhajan">
+
+      <h3>2025 RECAP</h3>
+      <p>Moments Happned in 2025</p>
+    </div>
+
+    <!-- BACK (HOVER OPTIONS) -->
+    <div class="card-back">
+        <center>
+    <h3>2025 RECAP</h3>
+      <p>Moments Happned in 2025</p>
+      </center>
+      <br>
+      <div class="media-option"
+           onclick="playMedia('video','media/krishna/video/trip.mp4')">
+        🎬 Video
+      </div>
+
+      <div class="media-option"
+           onclick="playMedia('audio','media/krishna/audio/song1.mp3')">
+        🎧 Audio
+      </div>
+
+      <div class="media-option"
+           onclick="playMedia('audio','media/krishna/karaoke/song1.mp3')">
+        🎤 Karaoke
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+ <div class="song-card">
+  <div class="card-inner">
+
+    <!-- FRONT -->
+    <div class="card-front">
+      <img src="images/thumbnails/hanuman.jpg" alt="Krishna Bhajan">
+
+      <h3>Govind Bolo Hari Gopal</h3>
+      <p>Traditional Krishna Bhajan • 6:24</p>
+    </div>
+
+    <!-- BACK (HOVER OPTIONS) -->
+    <div class="card-back">
+        <center>
+        <h1>Govind Bolo Hari Gopal</h1>
+      <h3>Traditional Krishna Bhajan • 6:24</h3>
+      </center>
+      <br>
+      <div class="media-option"
+           onclick="playMedia('video','media/krishna/video/song1.mp4')">
+        🎬 Video
+      </div>
+
+      <div class="media-option"
+           onclick="playMedia('audio','media/krishna/audio/song1.mp3')">
+        🎧 Audio
+      </div>
+
+      <div class="media-option"
+           onclick="playMedia('audio','media/krishna/karaoke/song1.mp3')">
+        🎤 Karaoke
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+    <div class="song-card">
+    <div class="card-inner">
+    
+        <!-- FRONT -->
+        <div class="card-front">
+        <img src="images/thumbnails/mata-rani.jpg" alt="Krishna Bhajan">
+    
+        <h3>Govind Bolo Hari Gopal</h3>
+        <p>Traditional Krishna Bhajan • 6:24</p>
+        </div>
+    
+        <!-- BACK (HOVER OPTIONS) -->
+        <div class="card-back">
+            <center>
+        <h1>Govind Bolo Hari Gopal</h1>
+      <h3>Traditional Krishna Bhajan • 6:24</h3>
+      </center>
+      <br>
+        <div class="media-option"
+            onclick="playMedia('video','media/krishna/video/song1.mp4')">
+            🎬 Video
+        </div>
+    
+        <div class="media-option"
+     onclick="playMedia('audio','media/krishna/audio/song1.mp3','Govind Bolo Hari Gopal')">
+  🎧 Audio
+</div>
+
+    
+        <div class="media-option"
+            onclick="playMedia('audio','media/krishna/karaoke/song1.mp3','Govind Bolo Hari Gopal')">
+            🎤 Karaoke
+        </div>
+        </div>
+    
+    </div>
+
+
+
+</section>
+
+<!-- Media Player -->
+<div id="playerModal" class="modal">
+  <span class="close" onclick="closePlayer()">×</span>
+  <div class="modal-content" id="playerContainer"></div>
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
