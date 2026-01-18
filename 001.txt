@@ -1,24 +1,32 @@
+https://docs.google.com/spreadsheets/d/13himKVCwCc8KtqHKTMNcUcll3ITr6uBPQ4KrXM8V98U/edit?usp=sharing
+
+
+
+
 function doPost(e) {
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName("Sheet1");
+  const SHEET_ID = "13himKVCwCc8KtqHKTMNcUcll3ITr6uBPQ4KrXM8V98U";
+  const SHEET_NAME = "Users";
 
-  sheet.appendRow([
-    new Date(),
-    e.parameter.Name,
-    e.parameter.Address,
-    e.parameter.City,
-    e.parameter.Phone,
-    e.parameter.DOB,
-    e.parameter.Gender,
-    e.parameter.Course,
-    e.parameter.Other,
-    e.parameter.Qualification
-  ]);
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+  const data = JSON.parse(e.postData.contents);
+  const rows = sheet.getDataRange().getValues();
 
-  return ContentService
-    .createTextOutput("Success")
-    .setMimeType(ContentService.MimeType.TEXT);
+  for (let i = 1; i < rows.length; i++) {
+    const [user, pass, status] = rows[i];
+
+    if (user === data.username && pass === data.password) {
+      if (status !== "active") {
+        return json({ success: false, message: "Blocked" });
+      }
+      return json({ success: true });
+    }
+  }
+
+  return json({ success: false, message: "Invalid" });
 }
 
-https://docs.google.com/spreadsheets/d/13HneB-FkDKJc5v5L6Cd7Zle5aG2kU5pgaZzQN7VsbWU/edit?usp=sharing
+function json(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
