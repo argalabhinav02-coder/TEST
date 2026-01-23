@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ABHINAV Music Library</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+      <!-- Open Graph Tags -->
+  <meta property="og:title" content="ABHINAV Music Library" />
+  <meta property="og:description" content="Original compositions & productions" />
+  <meta property="og:url" content="" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="" />
+
+  <!-- Optional but recommended -->
+  <meta name="description" content="Original compositions & productions" />
+
+    <!-- Favicon -->
+     <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.ico">
+
+<style>
+
+
+
+
+
+
+:root {
+  --bg: #050b18;
+  --card: rgba(255,255,255,0.08);
+  --accent: #22c55e;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 110px;
+}
+
+/* ---------- HEADER ---------- */
+header {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 1px;
+}
+
+header span {
+  color: var(--accent);
+}
+
+header p {
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+/* ---------- TRACK GRID ---------- */
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.track {
+  background: var(--card);
+  backdrop-filter: blur(15px);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease;
+}
+
+.track:hover {
+  transform: translateY(-6px);
+}
+
+
+.cover {
+  height: 160px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.track h3 {
+  margin-top: 15px;
+  font-size: 1.1rem;
+}
+
+.track p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.play {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent);
+  color: #000;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.play:hover {
+  background: #16a34a;
+  transform: scale(1.03);
+}
+
+/* ---------- MINI PLAYER ---------- */
+.player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(2,6,23,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.player .info {
+  flex: 1;
+}
+
+.player .info h4 {
+  font-size: 0.95rem;
+}
+
+.player .info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+audio {
+  width: 280px;
+}
+
+@media (max-width: 600px) {
+  audio {
+    width: 180px;
+  }
+}
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+</style>
+</head>
+
+<body>
+  
+<canvas id="bgCanvas"></canvas>
+
+<header>
+  <h1><span>ABHINAV</span> Music Library</h1>
+  <p>Original compositions & productions</p>
+</header>
+
+<section class="container">
+
+  <!-- TRACK 1 -->
+ <div class="track" data-src="music/SO CALLED PHONK.mp3" data-title="So Called Funk">
+  <div class="cover">
+    <img src="music/001.png" alt="So Called Funk">
+  </div>
+  <h3>So Called Funk</h3>
+  <p>Chill / Atmosphere</p>
+  <button class="play">▶ Play</button>
+</div>
+
+
+  <!-- TRACK 2 -->
+  <div class="track" data-src="music/Blaze.mp3" data-title="Blaze">
+     <div class="cover">
+    <img src="music/002.jpg" alt="Blaze">
+  </div>
+    <h3>Blaze</h3>
+    <p>Epic / Film Score</p>
+    <button class="play">▶ Play</button>
+  </div>
+
+  <!-- TRACK 3 -->
+  <div class="track" data-src="music/uf favela con shonci.mp3" data-title="uf favela con shonci">
+     <div class="cover">
+    <img src="music/003.jpg" alt="uf favela con shonci">
+  </div>
+    <h3>uf favela con shonci</h3>
+    <p>Pluck / Beats</p>
+    <button class="play">▶ Play</button>
+  </div>
+
+   <div class="track" data-src="music/SOLTA.mp3" data-title="SOLTA">
+     <div class="cover">
+    <img src="music/004.jpg" alt="SOLTA">
+  </div>
+    <h3>SOLTA</h3>
+    <p>Pluck / Beats</p>
+    <button class="play">▶ Play</button>
+  </div>
+
+   <div class="track" data-src="music/PAPO.mp3" data-title="PAPO">
+     <div class="cover">
+    <img src="music/005.jpg" alt="PAPO">
+  </div>
+    <h3>PAPO</h3>
+    <p>Pluck / Beats</p>
+    <button class="play">▶ Play</button>
+  </div>
+
+</section>
+
+<!-- MINI PLAYER -->
+<div class="player">
+  <div class="info">
+    <h4 id="nowTitle">Select a track</h4>
+    <span>ABHINAV Studio</span>
+  </div>
+  <audio id="audio" controls></audio>
+</div>
+
+<script>
+const audio = document.getElementById("audio");
+const nowTitle = document.getElementById("nowTitle");
+const tracks = document.querySelectorAll(".track"); 
+
+tracks.forEach(track => {
+  const btn = track.querySelector(".play");
+  const src = track.dataset.src;
+  const title = track.dataset.title;
+
+  btn.addEventListener("click", () => {
+    if (audio.src.includes(src)) {
+      audio.paused ? audio.play() : audio.pause();
+    } else {
+      audio.src = src;
+      audio.play();
+      nowTitle.textContent = title;
+    }
+  });
+});
+</script>
+<script>
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+const dots = Array.from({ length: 60 }, () => ({
+  x: Math.random() * w,
+  y: Math.random() * h,
+  r: Math.random() * 2 + 1,
+  dx: Math.random() * 0.5,
+  dy: Math.random() * 0.5
+}));
+
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+
+  dots.forEach(d => {
+    d.x += d.dx;
+    d.y += d.dy;
+
+    if (d.x < 0 || d.x > w) d.dx *= -1;
+    if (d.y < 0 || d.y > h) d.dy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(34,197,94,0.35)";
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+<script>
+const cursor = document.getElementById("custom-cursor");
+
+document.addEventListener("mousemove", e => {
+  cursor.style.left = e.clientX + "px";
+  cursor.style.top = e.clientY + "px";
+});
+</script>
+
+</body>
+</html>
