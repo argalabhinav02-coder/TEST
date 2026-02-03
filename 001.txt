@@ -15,7 +15,7 @@ function doPost(e) {
   for (let i = 1; i < rows.length; i++) {
     const [user, pass, status] = rows[i];
 
-    if (user === data.username && pass === data.password) {
+    if (user === data.username && pass === data.password) 
       if (status !== "active") {
         return json({ success: false, message: "Blocked" });
       }
