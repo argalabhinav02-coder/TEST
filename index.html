@@ -6,10 +6,34 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
       <!-- Open Graph Tags -->
   <meta property="og:title" content="ABHINAV Music Library" />
-  <meta property="og:description" content="Original compositions & productions" />
-  <meta property="og:url" content="" />
+  <meta property="og:description" content="Original Compositions & Productions" />
+  <meta property="og:image" content="https://theabhinav.vercel.app/011.jpg" />
+  <meta property="og:url" content="https://theabhinav.vercel.app" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ABHINAV Music Library" />
+  <meta name="twitter:description" content="Original Compositions & Productions" />
+  <meta name="twitter:image" content="https://theabhinav.vercel.app/011.jpg" />
+  <meta name="twitter:site" content="" />
+  <meta name="twitter:creator" content="" />
+  <meta name="keywords" content="music, beats, compositions, productions, original music, ABHINAV Studio" />
+  <meta name="author" content="ABHINAV" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22c55e" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="English" />
+  <meta name="revisit-after" content="7 days" />  
+  <meta name="copyright" content="ABHINAV Studio" />
+  <meta name="distribution" content="global" />
+  <meta name="rating" content="general" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ABHINAV Music Library" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-TileColor" content="#22c55e" />
+  <meta name="msapplication-TileImage" content="011.jpg" />
+  <meta name="msapplication-config" content="browserconfig.xml" />
 
   <!-- Optional but recommended -->
   <meta name="description" content="Original compositions & productions" />
@@ -179,6 +203,47 @@ audio {
   z-index: -1;
 }
 
+
+
+#visualizer {
+  width: 900px;
+  height: 45px;
+}
+
+@media (max-width: 600px) {
+  #visualizer {
+    width: 130px;
+  }
+}
+#fsBtn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#fsBtn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* Fullscreen visualizer mode */
+body.visualizer-fullscreen .player {
+  position: fixed;
+  inset: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+  z-index: 9999;
+}
+
+body.visualizer-fullscreen #visualizer {
+  width: 100vw;
+  height: 55vh;
+}
+
 </style>
 </head>
 
@@ -284,6 +349,26 @@ audio {
     <button class="play">▶ Play</button>
   </div>
 
+
+  <div class="track" data-src="music/big roar.mp3" data-title="Big Roar">
+     <div class="cover">
+    <img src="music/010.jpg" alt="Big Roar">
+  </div>
+    <h3>Big Roar</h3>
+    <p>Pluck / Beats</p>
+    <button class="play">▶ Play</button>
+  </div>
+
+
+  <div class="track" data-src="music/drum n step3.mp3" data-title="Drum n Step">
+     <div class="cover">
+    <img src="music/011.jpg" alt="Drum n Step">
+  </div>
+    <h3>Drum n Step</h3>
+    <p>Pluck / Beats</p>
+    <button class="play">▶ Play</button>
+  </div>
+
 </section>
 
 <!-- MINI PLAYER -->
@@ -292,13 +377,20 @@ audio {
     <h4 id="nowTitle">Select a track</h4>
     <span>ABHINAV Studio</span>
   </div>
+
+  <canvas id="visualizer"></canvas>
+
+  <button id="fsBtn">⛶</button>
   <audio id="audio" controls></audio>
 </div>
 
 <script>
+/* =====================================================
+   AUDIO PLAYER LOGIC
+===================================================== */
 const audio = document.getElementById("audio");
 const nowTitle = document.getElementById("nowTitle");
-const tracks = document.querySelectorAll(".track"); 
+const tracks = document.querySelectorAll(".track");
 
 tracks.forEach(track => {
   const btn = track.querySelector(".play");
@@ -315,55 +407,134 @@ tracks.forEach(track => {
     }
   });
 });
-</script>
-<script>
-const canvas = document.getElementById("bgCanvas");
-const ctx = canvas.getContext("2d");
 
-let w, h;
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
+/* =====================================================
+   AUDIO VISUALIZER (PLAYER BAR)
+===================================================== */
+const vCanvas = document.getElementById("visualizer");
+const vCtx = vCanvas.getContext("2d");
+
+function resizeVisualizer() {
+  vCanvas.width = vCanvas.clientWidth;
+  vCanvas.height = vCanvas.clientHeight;
 }
-window.addEventListener("resize", resize);
-resize();
+window.addEventListener("resize", resizeVisualizer);
+resizeVisualizer();
+
+let audioCtx, analyser, source, dataArray;
+
+function setupVisualizer() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 64;
+
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  source = audioCtx.createMediaElementSource(audio);
+
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  drawVisualizer();
+}
+
+function drawVisualizer() {
+  requestAnimationFrame(drawVisualizer);
+  analyser.getByteFrequencyData(dataArray);
+
+  vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
+  const barWidth = vCanvas.width / dataArray.length;
+
+  dataArray.forEach((value, i) => {
+    const barHeight = value / 1.2;
+    const x = i * barWidth;
+
+    const gradient = vCtx.createLinearGradient(0, 0, 0, vCanvas.height);
+    gradient.addColorStop(0, "#22c55e");
+    gradient.addColorStop(0.5, "#3b82f6");
+    gradient.addColorStop(1, "#a855f7");
+
+    vCtx.fillStyle = gradient;
+    vCtx.fillRect(
+      x,
+      vCanvas.height - barHeight,
+      barWidth - 2,
+      barHeight
+    );
+  });
+}
+
+audio.addEventListener("play", () => {
+  if (!audioCtx) setupVisualizer();
+});
+
+/* =====================================================
+   MOTION BACKGROUND (FLOATING DOTS)
+===================================================== */
+const bgCanvas = document.getElementById("bgCanvas");
+const bgCtx = bgCanvas.getContext("2d");
+
+function resizeBG() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeBG);
+resizeBG();
 
 const dots = Array.from({ length: 60 }, () => ({
-  x: Math.random() * w,
-  y: Math.random() * h,
+  x: Math.random() * bgCanvas.width,
+  y: Math.random() * bgCanvas.height,
   r: Math.random() * 2 + 1,
   dx: Math.random() * 0.5,
   dy: Math.random() * 0.5
 }));
 
-function animate() {
-  ctx.clearRect(0, 0, w, h);
+function animateBG() {
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
 
   dots.forEach(d => {
     d.x += d.dx;
     d.y += d.dy;
 
-    if (d.x < 0 || d.x > w) d.dx *= -1;
-    if (d.y < 0 || d.y > h) d.dy *= -1;
+    if (d.x < 0 || d.x > bgCanvas.width) d.dx *= -1;
+    if (d.y < 0 || d.y > bgCanvas.height) d.dy *= -1;
 
-    ctx.beginPath();
-    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(34,197,94,0.35)";
-    ctx.fill();
+    bgCtx.beginPath();
+    bgCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+    bgCtx.fillStyle = "rgba(34,197,94,0.35)";
+    bgCtx.fill();
   });
 
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animateBG);
 }
+animateBG();
+/* =====================================================
+   FULLSCREEN VISUALIZER MODE
+===================================================== */
+const fsBtn = document.getElementById("fsBtn");
 
-animate();
-</script>
-<script>
+fsBtn.addEventListener("click", () => {
+  document.body.classList.toggle("visualizer-fullscreen");
+  resizeVisualizer();
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.body.classList.remove("visualizer-fullscreen");
+    resizeVisualizer();
+  }
+});
+
+/* =====================================================
+   OPTIONAL: SAFE CUSTOM CURSOR (ONLY IF EXISTS)
+===================================================== */
 const cursor = document.getElementById("custom-cursor");
 
-document.addEventListener("mousemove", e => {
-  cursor.style.left = e.clientX + "px";
-  cursor.style.top = e.clientY + "px";
-});
+if (cursor) {
+  document.addEventListener("mousemove", e => {
+    cursor.style.left = e.clientX + "px";
+    cursor.style.top = e.clientY + "px";
+  });
+}
 </script>
 
 </body>
