@@ -1,0 +1,372 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Abacus</title>
+
+
+     <!-- Favicon -->
+   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/logo.png"/>
+
+    <STYLE>
+      :root {
+    --frame-color: #000000; /* SaddleBrown - wood frame */
+    --separator-color: #ffffff; /* Dark gray/black - separator bar */
+    --bead-color: #00ff00; /* Sienna - bead color */
+    --rod-color: rgb(255, 242, 186); /* Black - rod lines */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #fffeba;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+#abacus {
+    text-align: center;
+}
+
+#frame {
+    display: flex;
+    position: relative;
+    width: 1200px; /* Adjust as needed */
+    height: 350px;
+    background-color: var(--frame-color);
+    border: 15px solid var(--frame-color);
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+}
+
+#separator {
+    position: absolute;
+    top: 30%; /* Position the bar */
+    left: 0;
+    right: 0;
+    height: 15px;
+    background-color: var(--separator-color);
+    z-index: 10;
+}
+
+#rods-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.rod {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 2px; /* The physical rod line */
+    height: 100%;
+    background-color: var(--rod-color);
+    position: relative;
+    z-index: 5;
+}
+
+.beads {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.heaven-beads {
+    height: calc(30% - 7.5px); /* Space above separator */
+    justify-content: flex-start; /* Start at the top */
+    padding-top: 0px; /* Small gap from the frame */
+}
+
+.earth-beads {
+    height: calc(70% - 7.5px); /* Space below separator */
+    justify-content: flex-end; /* Start at the bottom */
+    padding-bottom: 0px; /* Small gap from the frame */
+}
+
+.bead {
+    width: 70px;
+    height: 35px;
+    background-color: var(--bead-color);
+    border-radius: 20px;
+    margin: 2px 0;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease; /* For movement */
+}
+
+/* Initial "reset" position */
+.heaven.moved {
+    transform: translateY(59px); /* Move down towards separator */
+}
+
+.earth:not(.moved) {
+    transform: translateY(0); /* Default position (bottom of rod) */
+}
+
+/* When earth beads are moved up */
+.earth.moved {
+    transform: translateY(-75px); /* Move up towards separator (adjust value) */
+}
+
+#result {
+    font-size: 8.5em;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+}
+
+button {
+    padding: 3px 30px;
+    margin-top: 20px;
+    font-size: 3em;
+    cursor: pointer;
+    background-color: var(--frame-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+/* From Uiverse.io by adamgiebl */ 
+.cssbuttons-io {
+  position: relative;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 35px;
+  letter-spacing: 0.05em;
+  border-radius: 0.8em;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(to right, #b46df1, #4a00e0);
+  color: ghostwhite;
+  overflow: hidden;
+}
+
+.cssbuttons-io svg {
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 0.5em;
+}
+
+.cssbuttons-io span {
+  position: relative;
+  z-index: 10;
+  transition: color 0.4s;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8em 1.2em 0.8em 1.05em;
+}
+
+.cssbuttons-io::before,
+.cssbuttons-io::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.cssbuttons-io::before {
+  content: "";
+  background: #000;
+  width: 120%;
+  left: -10%;
+  transform: skew(30deg);
+  transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+
+.cssbuttons-io:hover::before {
+  transform: translate3d(100%, 0, 0);
+}
+
+.cssbuttons-io:active {
+  transform: scale(0.95);
+}
+
+/* Target the Earth bead CLOSEST to the separator (1st bead in the earth-beads group) */
+.earth-beads .bead.earth:nth-child(1) {
+    background-color: #FFFF00; /* Gold */
+}
+.earth-beads .bead.earth:nth-child(2) {
+    background-color: #00aeff; /* Gold */
+}
+.earth-beads .bead.earth:nth-child(3) {
+    background-color: #ffffff; /* Gold */
+}
+
+
+/* Target the Earth bead CLOSEST to the bottom frame (4th bead in the earth-beads group) */
+.earth-beads .bead.earth:nth-child(4) {
+    background-color: #ff0000; /* Medium Violet Red */
+}
+    </STYLE>
+</head>
+<body>
+    <div id="abacus">
+        <div id="result">0</div>
+        <div id="frame">
+            <div id="separator"></div>
+            <div id="rods-container">
+                <div class="rod">
+                    <div class="beads heaven-beads">
+                        <div class="bead heaven" data-value="5"></div>
+                    </div>
+                    <div class="beads earth-beads">
+                        <div class="bead earth" data-value="1"></div>
+                        <div class="bead earth" data-value="1"></div>
+                        <div class="bead earth" data-value="1"></div>
+                        <div class="bead earth" data-value="1"></div>
+                    </div>
+                </div>
+                </div>
+        </div>
+       <button class="cssbuttons-io" onclick="resetAbacus()">
+  <span
+    >RESET ⟳</span>
+    
+</button>
+    </div>
+
+    <script>
+      const NUM_RODS = 13;
+const FRAME_ID = 'rods-container';
+
+// --- 1. Initial Setup: Create the rods and beads dynamically ---
+function createAbacusRods() {
+    const rodsContainer = document.getElementById(FRAME_ID);
+    rodsContainer.innerHTML = ''; // Clear any existing content
+
+    for (let i = 0; i < NUM_RODS; i++) {
+        const rodDiv = document.createElement('div');
+        rodDiv.classList.add('rod');
+
+        // Heaven Beads (1 bead, value 5)
+        const heavenBeads = document.createElement('div');
+        heavenBeads.classList.add('beads', 'heaven-beads');
+        const heavenBead = createBead('heaven', 5);
+        heavenBeads.appendChild(heavenBead);
+        rodDiv.appendChild(heavenBeads);
+
+        // Earth Beads (4 beads, value 1 each)
+        const earthBeads = document.createElement('div');
+        earthBeads.classList.add('beads', 'earth-beads');
+        for (let j = 0; j < 4; j++) {
+            earthBeads.appendChild(createBead('earth', 1));
+        }
+        rodDiv.appendChild(earthBeads);
+        rodsContainer.appendChild(rodDiv);
+    }
+    // Attach event listeners after creation
+    document.querySelectorAll('.bead').forEach(bead => {
+        bead.addEventListener('click', handleBeadClick);
+    });
+
+    calculateAbacusValue(); // Initial calculation
+}
+
+function createBead(type, value) {
+    const bead = document.createElement('div');
+    bead.classList.add('bead', type);
+    bead.dataset.value = value;
+    bead.dataset.moved = 'false'; // Custom state flag
+    return bead;
+}
+
+// --- 2. Logic: Handle Bead Movement and State ---
+function handleBeadClick(event) {
+    const clickedBead = event.target;
+    const isHeaven = clickedBead.classList.contains('heaven');
+    const rodElement = clickedBead.closest('.rod');
+    
+    // Get all beads in the same set (Heaven or Earth) on this rod
+    const siblingBeads = isHeaven 
+        ? rodElement.querySelectorAll('.heaven')
+        : rodElement.querySelectorAll('.earth');
+
+    if (isHeaven) {
+        // Heaven bead moves independently: Toggle moved state
+        clickedBead.classList.toggle('moved');
+        clickedBead.dataset.moved = clickedBead.classList.contains('moved');
+    } else {
+        // Earth beads: Move all beads between the clicked bead and the separator
+        const beadsArray = Array.from(siblingBeads);
+        const clickedIndex = beadsArray.indexOf(clickedBead);
+        
+        // Check if the current state is 'moved' (pushed up)
+        const isCurrentlyMoved = clickedBead.classList.contains('moved');
+
+        beadsArray.forEach((bead, index) => {
+            if (isCurrentlyMoved) {
+                // If currently moved, check if the bead is *above* the clicked one (closer to separator)
+                // If it is above, it should also move down (un-move)
+                if (index >= clickedIndex) {
+                     bead.classList.remove('moved');
+                     bead.dataset.moved = 'false';
+                }
+            } else {
+                // If currently NOT moved, check if the bead is *below* the clicked one (closer to bottom)
+                // If it is below, it should also move up (move)
+                if (index <= clickedIndex) {
+                    bead.classList.add('moved');
+                    bead.dataset.moved = 'true';
+                }
+            }
+        });
+    }
+
+    calculateAbacusValue();
+}
+
+// --- 3. Calculation: Determine the total value ---
+function calculateAbacusValue() {
+    const rods = document.querySelectorAll('.rod');
+    let totalValue = '';
+
+    rods.forEach(rod => {
+        let rodValue = 0;
+        
+        // 1. Heaven Bead (Value 5)
+        const heavenBead = rod.querySelector('.heaven');
+        if (heavenBead && heavenBead.classList.contains('moved')) {
+            rodValue += parseInt(heavenBead.dataset.value);
+        }
+
+        // 2. Earth Beads (Value 1 each)
+        const earthBeads = rod.querySelectorAll('.earth');
+        earthBeads.forEach(bead => {
+            if (bead.classList.contains('moved')) {
+                rodValue += parseInt(bead.dataset.value);
+            }
+        });
+
+        // The abacus reads 0-9 per rod
+        totalValue += rodValue.toString();
+    });
+
+    // Clean up leading zeros and update the display
+    const cleanedValue = BigInt(totalValue).toString();
+    document.getElementById('result').textContent = cleanedValue;
+}
+
+// --- 4. Reset Function ---
+function resetAbacus() {
+    document.querySelectorAll('.bead').forEach(bead => {
+        bead.classList.remove('moved');
+        bead.dataset.moved = 'false';
+    });
+    calculateAbacusValue();
+}
+
+// --- Run on page load ---
+document.addEventListener('DOMContentLoaded', createAbacusRods);
+    </script>
+</body>
+</html>

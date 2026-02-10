@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Tools</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo"> <picture>
+  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
+  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.gif" alt="⚡" width="24" height="24">
+</picture> TOOLVERSE</div>
+
+  <ul class="nav-links">
+    <li><a href="#" class="active">All Tools</a></li>
+
+    <!-- DROPDOWN -->
+    <li class="dropdown">
+      <a href="#">Categories ⮟</a>
+      <ul class="dropdown-menu">
+        <li><a href="#">AI Tools</a></li>
+        <li><a href="#">Educational Tools</a></li>
+        <li><a href="#">Timers</a></li>
+        <li><a href="#">Utilities</a></li>
+        <li><a href="#">Productivity</a></li>
+      </ul>
+    </li>
+
+    <li><a href="#">About</a></li>
+  </ul>
+
+  <div class="menu-toggle" id="menuToggle">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<header class="header">
+ <picture>
+  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
+  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.gif" alt="⚡" width="100" height="100">
+</picture>
+
+  <p>Practice • Track • Countdown</p>
+</header>
+
+
+<section class="card-container">
+
+  <!-- Abacus -->
+  <div class="tool-card">
+    <div class="preview">
+      <iframe src="abacus-tool.html" loading="lazy"></iframe>
+    </div>
+    <h2>Working Abacus</h2>
+    <a href="abacus-tool.html" class="btn">Open Tool</a>
+  </div>
+
+  <!-- Stopwatch -->
+  <div class="tool-card">
+    <div class="preview">
+      <iframe src="stopwatch.html" loading="lazy"></iframe>
+    </div>
+    <h2>Stopwatch</h2>
+    <a href="Stopwatch.html" class="btn">Open Tool</a>
+  </div>
+
+  <!-- Countdown -->
+  <div class="tool-card">
+    <div class="preview">
+      <iframe src="countdown.html" loading="lazy"></iframe>
+    </div>
+    <h2>Countdown Timer</h2>
+    <a href="countdown.html" class="btn">Open Tool</a>
+  </div>
+
+</section>
+
+<footer>
+  © 2026 • Designed by Abhinav
+</footer>
+<script>
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.querySelector(".nav-links");
+const dropdown = document.querySelector(".dropdown > a");
+
+menuToggle.addEventListener("click", () => {
+  navLinks.classList.toggle("active");
+});
+
+dropdown.addEventListener("click", (e) => {
+  if (window.innerWidth <= 900) {
+    e.preventDefault();
+    dropdown.parentElement.classList.toggle("open");
+  }
+});
+</script>
+
+
+</body>
+</html>
