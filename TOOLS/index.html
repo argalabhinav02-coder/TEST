@@ -2,102 +2,208 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Interactive Tools</title>
+<title>ToolVerse</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
 </head>
 <body>
-<nav class="navbar">
-  <div class="nav-logo"> <picture>
-  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
-  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.gif" alt="⚡" width="24" height="24">
-</picture> TOOLVERSE</div>
 
-  <ul class="nav-links">
-    <li><a href="#" class="active">All Tools</a></li>
-
-    <!-- DROPDOWN -->
-    <li class="dropdown">
-      <a href="#">Categories ⮟</a>
-      <ul class="dropdown-menu">
-        <li><a href="#">AI Tools</a></li>
-        <li><a href="#">Educational Tools</a></li>
-        <li><a href="#">Timers</a></li>
-        <li><a href="#">Utilities</a></li>
-        <li><a href="#">Productivity</a></li>
-      </ul>
-    </li>
-
-    <li><a href="#">About</a></li>
-  </ul>
-
-  <div class="menu-toggle" id="menuToggle">
-    <span></span><span></span><span></span>
-  </div>
-</nav>
-
-<header class="header">
- <picture>
-  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" type="image/webp">
-  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.gif" alt="⚡" width="100" height="100">
-</picture>
-
-  <p>Practice • Track • Countdown</p>
-</header>
+<!-- NAVBAR -->
 
 
-<section class="card-container">
+<!-- MEGA SEARCH -->
+<div class="mega-search">
+  <input id="searchInput" placeholder="Search tools or categories...">
+</div>
 
-  <!-- Abacus -->
-  <div class="tool-card">
-    <div class="preview">
-      <iframe src="abacus-tool.html" loading="lazy"></iframe>
-    </div>
-    <h2>Working Abacus</h2>
-    <a href="abacus-tool.html" class="btn">Open Tool</a>
-  </div>
+<!-- CATEGORY PILLS -->
+<div class="pill-bar">
+    <div class="pill-slider"></div>
+<button class="pill active" onclick="setCategory('all', this)">All</button>
+<button class="pill" onclick="setCategory('educational', this)">🎓 Educational</button>
+<button class="pill" onclick="setCategory('audio-ai', this)">🎧 Audio AI</button>
+<button class="pill" onclick="setCategory('video-ai', this)">🎥 Video AI</button>
+<button class="pill" onclick="setCategory('timers', this)">⏱ Timers</button>
 
-  <!-- Stopwatch -->
-  <div class="tool-card">
-    <div class="preview">
-      <iframe src="stopwatch.html" loading="lazy"></iframe>
-    </div>
-    <h2>Stopwatch</h2>
-    <a href="Stopwatch.html" class="btn">Open Tool</a>
-  </div>
 
-  <!-- Countdown -->
-  <div class="tool-card">
-    <div class="preview">
-      <iframe src="countdown.html" loading="lazy"></iframe>
-    </div>
-    <h2>Countdown Timer</h2>
-    <a href="countdown.html" class="btn">Open Tool</a>
-  </div>
 
-</section>
+</div>
 
-<footer>
-  © 2026 • Designed by Abhinav
-</footer>
+<!-- TOOLS -->
+<div id="toolsGrid" class="tools-grid"></div>
+
+<footer>© 2026 • Designed by Abhinav</footer>
+
 <script>
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.querySelector(".nav-links");
-const dropdown = document.querySelector(".dropdown > a");
-
-menuToggle.addEventListener("click", () => {
-  navLinks.classList.toggle("active");
-});
-
-dropdown.addEventListener("click", (e) => {
-  if (window.innerWidth <= 900) {
-    e.preventDefault();
-    dropdown.parentElement.classList.toggle("open");
+/* ===== TOOLS DATA ===== */
+const tools = [
+  {
+    name: "Working Abacus",
+    category: "educational",
+    link: "abacus.html",
+    image: "https://www.viva24.online/img/carousel-1.jpg"
+  },
+  {
+    name: "Stopwatch",
+    category: "timers",
+    link: "stopwatch.html",
+    image: "https://www.viva24.online/img/carousel-2.jpg"
+  },
+  {
+    name: "Countdown Timer",
+    category: "timers",
+    link: "countdown.html",
+    image: "https://www.viva24.online/img/carousel-3.jpg"
+  },
+  {
+    name: "AI Voice Generator",
+    category: "audio-ai",
+    link: "#",
+    image: "https://www.viva24.online/img/carousel-4.jpg"
+  },
+  {
+    name: "Working Abacus",
+    category: "educational",
+    link: "abacus.html",
+    image: "https://www.viva24.online/img/carousel-5.jpg"
+  },
+  {
+    name: "Stopwatch",
+    category: "timers",
+    link: "stopwatch.html",
+    image: "https://www.viva24.online/img/carousel-6.jpg"
+  },
+  {
+    name: "Countdown Timer",
+    category: "timers",
+    link: "countdown.html",
+    image: "https://www.viva24.online/img/carousel-7.jpg"
+  },
+  {
+    name: "AI Voice Generator",
+    category: "audio-ai",
+    link: "#",
+    image: "https://www.viva24.online/img/carousel-8.jpg"
+  },
+  {
+    name: "Working Abacus",
+    category: "educational",
+    link: "abacus.html",
+    image: "https://www.viva24.online/img/carousel-9.jpg"
+  },
+  {
+    name: "Stopwatch",
+    category: "timers",
+    link: "stopwatch.html",
+    image: "https://www.viva24.online/img/carousel-10.jpg"
+  },
+  {
+    name: "Countdown Timer",
+    category: "timers",
+    link: "countdown.html",
+    image: "https://www.viva24.online/img/carousel-11.jpg"
+  },
+  {
+    name: "AI Voice Generator",
+    category: "audio-ai",
+    link: "#",
+    image: "https://www.viva24.online/img/carousel-12.jpg"
+  },
+  {
+    name: "Working Abacus",
+    category: "educational",
+    link: "abacus.html",
+    image: "https://www.viva24.online/img/carousel-13.jpg"
+  },
+  {
+    name: "Stopwatch",
+    category: "timers",
+    link: "stopwatch.html",
+    image: "https://www.viva24.online/img/carousel-14.jpg"
+  },
+  {
+    name: "Countdown Timer",
+    category: "timers",
+    link: "countdown.html",
+    image: "https://www.viva24.online/img/carousel-15.jpg"
+  },
+  {
+    name: "AI Voice Generator",
+    category: "audio-ai",
+    link: "#",
+    image: "https://www.viva24.online/img/carousel-16.jpg"
   }
-});
-</script>
+  
+];
 
+
+let activeCategory = "all";
+
+/* ===== RENDER ===== */
+function render() {
+  const grid = document.getElementById("toolsGrid");
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  grid.innerHTML = "";
+
+  const filtered = tools.filter(t =>
+    (activeCategory === "all" || t.category === activeCategory) &&
+    t.name.toLowerCase().includes(q)
+  );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="tool-card not-found">
+        😔 Sorry, the tool you are finding is not here
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(t => {
+   grid.innerHTML += `
+  <div class="tool-card">
+    <div class="tool-preview">
+      <img src="${t.image}" alt="${t.name}" loading="lazy">
+    </div>
+    <h3>${t.name}</h3>
+    <a href="${t.link}" class="btn">Open Tool</a>
+  </div>
+`;
+
+  });
+}
+
+
+/* ===== CATEGORY ===== */
+function setCategory(cat, el) {
+  activeCategory = cat;
+  document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
+  movePillSlider(el);
+  render();
+}
+
+
+/* SEARCH */
+document.getElementById("searchInput").addEventListener("input", render);
+
+render();
+window.onload = () => {
+  const active = document.querySelector(".pill.active");
+  movePillSlider(active);
+};
+
+
+
+
+
+function movePillSlider(el) {
+  const slider = document.querySelector(".pill-slider");
+  slider.style.width = el.offsetWidth + "px";
+  slider.style.left = el.offsetLeft + "px";
+}
+
+</script>
 
 </body>
 </html>
