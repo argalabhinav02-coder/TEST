@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Secure Access</title>
+<title>Secure Document Vault</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -11,10 +11,18 @@ body {
   font-family: system-ui;
   background: #020617;
   color: white;
+}
+
+/* COMMON */
+.hidden { display: none; }
+.error { color: #f87171; }
+
+/* AUTH SCREENS */
+.auth-box {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 .box {
@@ -31,7 +39,6 @@ input, button {
   margin-top: 10px;
   border-radius: 8px;
   border: none;
-  font-size: 16px;
 }
 
 button {
@@ -40,43 +47,100 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #1d4ed8;
+/* NAVBAR */
+.navbar {
+  background: #020617;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.hidden { display: none; }
-.error { color: #f87171; font-size: 14px; }
-.success { color: #4ade80; font-size: 14px; }
+.navbar a {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+/* DOCUMENTS */
+.cards {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+}
 </style>
 </head>
 
 <body>
 
 <!-- STEP 1: ADMIN CODE -->
-<div class="box" id="codeBox">
-  <h2>Enter Admin Code</h2>
-  <input type="password" id="adminCode" placeholder="Admin Code">
-  <button onclick="checkCode()">Continue</button>
-  <p id="codeError" class="error"></p>
+<div class="auth-box" id="codeScreen">
+  <div class="box">
+    <h2>Enter Admin Code</h2>
+    <input type="password" id="adminCode" placeholder="Admin Code">
+    <button onclick="checkCode()">Continue</button>
+    <p id="codeError" class="error"></p>
+  </div>
 </div>
 
 <!-- STEP 2: OTP -->
-<div class="box hidden" id="otpBox">
-  <h2>Verify OTP</h2>
-  <p id="mobileText"></p>
-  <input type="text" id="otpInput" placeholder="Enter OTP">
-  <button onclick="verifyOTP()">Verify</button>
-  <p id="otpError" class="error"></p>
+<div class="auth-box hidden" id="otpScreen">
+  <div class="box">
+    <h2>Verify OTP</h2>
+    <p id="mobileText"></p>
+    <input type="text" id="otpInput" placeholder="Enter OTP">
+    <button onclick="verifyOTP()">Verify</button>
+    <p id="otpError" class="error"></p>
+  </div>
 </div>
 
-<!-- STEP 3: SUCCESS -->
-<div class="box hidden" id="successBox">
-  <h2>Access Granted ✅</h2>
-  <p class="success">Welcome to the secure website</p>
+<!-- STEP 3: DOCUMENT DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div><b>My Secure Vault</b></div>
+    <div>
+      <a onclick="showCategory('aadhar')">Aadhar</a>
+      <a onclick="showCategory('caste')">Caste</a>
+      <a onclick="showCategory('marksheet')">Marksheet</a>
+      <a onclick="showCategory('all')">All</a>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS -->
+  <div class="cards">
+
+    <div class="card aadhar">
+      <img src="docs/aadhar.jpg" alt="Aadhar">
+      <p>Aadhar Card</p>
+    </div>
+
+    <div class="card caste">
+      <img src="docs/caste.jpg" alt="Caste">
+      <p>Caste Certificate</p>
+    </div>
+
+    <div class="card marksheet">
+      <img src="docs/marksheet.jpg" alt="Marksheet">
+      <p>Marksheet</p>
+    </div>
+
+  </div>
 </div>
 
 <script>
-/* ADMIN CODE → MOBILE MAP */
+/* ADMIN → MOBILE MAP */
 const adminMap = {
   "1234": "9977912974",
   "4321": "8878017278"
@@ -86,44 +150,43 @@ let generatedOTP = "";
 
 /* STEP 1 */
 function checkCode() {
-  const code = document.getElementById("adminCode").value;
-  const error = document.getElementById("codeError");
-
+  const code = adminCode.value;
   if (!adminMap[code]) {
-    error.textContent = "Invalid admin code";
+    codeError.textContent = "Invalid admin code";
     return;
   }
 
-  error.textContent = "";
-  document.getElementById("codeBox").classList.add("hidden");
-  document.getElementById("otpBox").classList.remove("hidden");
+  codeError.textContent = "";
+  codeScreen.classList.add("hidden");
+  otpScreen.classList.remove("hidden");
 
   const mobile = adminMap[code];
-  document.getElementById("mobileText").textContent =
-    "OTP sent to +91 ******" + mobile.slice(-4);
+  mobileText.textContent = "OTP sent to +91 ******" + mobile.slice(-4);
 
-  generateOTP();
-}
-
-/* OTP GENERATION (DEMO) */
-function generateOTP() {
   generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-  console.log("DEMO OTP:", generatedOTP); // visible only in console
+  console.log("DEMO OTP:", generatedOTP);
 }
 
 /* STEP 2 */
 function verifyOTP() {
-  const entered = document.getElementById("otpInput").value;
-  const error = document.getElementById("otpError");
-
-  if (entered !== generatedOTP) {
-    error.textContent = "Invalid OTP";
+  if (otpInput.value !== generatedOTP) {
+    otpError.textContent = "Invalid OTP";
     return;
   }
 
-  error.textContent = "";
-  document.getElementById("otpBox").classList.add("hidden");
-  document.getElementById("successBox").classList.remove("hidden");
+  otpError.textContent = "";
+  otpScreen.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+}
+
+/* CATEGORY FILTER */
+function showCategory(cat) {
+  document.querySelectorAll(".card").forEach(card => {
+    card.style.display =
+      cat === "all" || card.classList.contains(cat)
+        ? "block"
+        : "none";
+  });
 }
 </script>
 
