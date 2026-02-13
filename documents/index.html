@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Access</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui;
+  background: #020617;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  background: #0f172a;
+  padding: 25px;
+  width: 320px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.hidden { display: none; }
+.error { color: #f87171; font-size: 14px; }
+.success { color: #4ade80; font-size: 14px; }
+</style>
+</head>
+
+<body>
+
+<!-- STEP 1: ADMIN CODE -->
+<div class="box" id="codeBox">
+  <h2>Enter Admin Code</h2>
+  <input type="password" id="adminCode" placeholder="Admin Code">
+  <button onclick="checkCode()">Continue</button>
+  <p id="codeError" class="error"></p>
+</div>
+
+<!-- STEP 2: OTP -->
+<div class="box hidden" id="otpBox">
+  <h2>Verify OTP</h2>
+  <p id="mobileText"></p>
+  <input type="text" id="otpInput" placeholder="Enter OTP">
+  <button onclick="verifyOTP()">Verify</button>
+  <p id="otpError" class="error"></p>
+</div>
+
+<!-- STEP 3: SUCCESS -->
+<div class="box hidden" id="successBox">
+  <h2>Access Granted ✅</h2>
+  <p class="success">Welcome to the secure website</p>
+</div>
+
+<script>
+/* ADMIN CODE → MOBILE MAP */
+const adminMap = {
+  "1234": "9977912974",
+  "4321": "8878017278"
+};
+
+let generatedOTP = "";
+
+/* STEP 1 */
+function checkCode() {
+  const code = document.getElementById("adminCode").value;
+  const error = document.getElementById("codeError");
+
+  if (!adminMap[code]) {
+    error.textContent = "Invalid admin code";
+    return;
+  }
+
+  error.textContent = "";
+  document.getElementById("codeBox").classList.add("hidden");
+  document.getElementById("otpBox").classList.remove("hidden");
+
+  const mobile = adminMap[code];
+  document.getElementById("mobileText").textContent =
+    "OTP sent to +91 ******" + mobile.slice(-4);
+
+  generateOTP();
+}
+
+/* OTP GENERATION (DEMO) */
+function generateOTP() {
+  generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log("DEMO OTP:", generatedOTP); // visible only in console
+}
+
+/* STEP 2 */
+function verifyOTP() {
+  const entered = document.getElementById("otpInput").value;
+  const error = document.getElementById("otpError");
+
+  if (entered !== generatedOTP) {
+    error.textContent = "Invalid OTP";
+    return;
+  }
+
+  error.textContent = "";
+  document.getElementById("otpBox").classList.add("hidden");
+  document.getElementById("successBox").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
