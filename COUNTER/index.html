@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Visitor Counter with Offset</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0;
+            background: #0f172a; 
+            color: white;
+        }
+        .counter-card { 
+            background: #1e293b; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+            text-align: center; 
+            border: 1px solid #334155;
+        }
+        #count { 
+            font-size: 5rem; 
+            font-weight: 900; 
+            color: #38bdf8; 
+            letter-spacing: -2px;
+        }
+        .label { color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="counter-card">
+    <div class="label">Total Visitors</div>
+    <div id="count">....</div>
+</div>
+
+<script>
+    // 1. CHOOSE YOUR STARTING NUMBER HERE
+    const startingNumber = 8000; 
+
+    // 2. USE A UNIQUE NAME (Change this to anything unique for your site)
+    const namespace = "my-custom-project-v1";
+    const key = "visits";
+
+    async function updateCounter() {
+        try {
+            const response = await fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`);
+            const data = await response.json();
+            
+            // 3. MATH: API Count + Starting Number
+            const totalVisits = data.count + startingNumber;
+            
+            // Update the display
+            document.getElementById('count').innerText = totalVisits.toLocaleString(); 
+            // .toLocaleString() adds commas (e.g., 8,001)
+            
+        } catch (error) {
+            console.error("Counter error:", error);
+            document.getElementById('count').innerText = startingNumber;
+        }
+    }
+
+    updateCounter();
+</script>
+
+</body>
+</html>
