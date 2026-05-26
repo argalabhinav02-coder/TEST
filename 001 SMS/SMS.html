@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Pro | Ultimate Organization Suite</title>
+    <!-- CSS & Framework Resources -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #090a10;
+            --bg-surface: rgba(255, 255, 255, 0.03);
+            --border-glow: rgba(255, 255, 255, 0.07);
+            --text-primary: #f3f4f6;
+            --text-muted: #8e939e;
+            --primary: #6366f1;
+            --secondary: #d946ef;
+            --accent: #14b8a6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --sidebar-w: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-primary); min-height: 100vh; display: flex; overflow: hidden; }
+        
+        .glass { background: var(--bg-surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-glow); border-radius: 14px; }
+        
+        /* Layout Structure */
+        #auth-container { position: fixed; inset: 0; background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
+        #app-container { display: flex; width: 100vw; height: 100vh; opacity: 0; transition: opacity 0.5s ease; }
+        
+        /* Navigation Sidebar */
+        .sidebar { width: var(--sidebar-w); height: 100%; border-right: 1px solid var(--border-glow); padding: 32px 24px; display: flex; flex-direction: column; background: rgba(9, 10, 16, 0.6); overflow-y: auto; }
+        .logo { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 48px; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+        .nav-item a { display: flex; align-items: center; gap: 14px; padding: 14px 18px; color: var(--text-muted); text-decoration: none; border-radius: 10px; font-weight: 500; transition: all 0.2s ease; }
+        .nav-item a:hover, .nav-item a.active { color: white; background: rgba(255, 255, 255, 0.05); }
+        .nav-item a.active { border-left: 3px solid var(--primary); background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, transparent 100%); }
+
+        /* Main Context Display */
+        .workspace { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { height: 85px; border-bottom: 1px solid var(--border-glow); padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+        .search-wrapper { position: relative; width: 350px; }
+        .search-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-wrapper input { width: 100%; padding: 12px 16px 12px 48px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glow); border-radius: 30px; color: white; outline: none; transition: 0.3s; }
+        .search-wrapper input:focus { border-color: var(--primary); }
+
+        .view-section { padding: 40px; overflow-y: auto; height: calc(100vh - 85px); display: none; }
+        .view-section.active { display: block; }
+
+        /* SaaS Components & Styling */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .kpi-card { padding: 24px; position: relative; overflow: hidden; }
+        .kpi-card h4 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .kpi-card .value { font-size: 2.2rem; font-weight: 700; margin-bottom: 4px; }
+        
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px; }
+        @media (max-width: 1024px) { .charts-container { grid-template-columns: 1fr; } }
+        .chart-box { padding: 24px; height: 380px; display: flex; flex-direction: column; }
+        
+        /* Modern Data Tables */
+        .table-card { overflow: hidden; margin-top: 24px; }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 18px 24px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-glow); white-space: nowrap; }
+        td { padding: 18px 24px; border-bottom: 1px solid var(--border-glow); font-size: 0.95rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.01); }
+
+        /* Accordion UI */
+        .accordion-item { margin-bottom: 12px; overflow: hidden; }
+        .accordion-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(255,255,255,0.01); transition: 0.2s; }
+        .accordion-header:hover { background: rgba(255,255,255,0.03); }
+        .accordion-content { display: none; padding: 24px; border-top: 1px solid var(--border-glow); background: rgba(0,0,0,0.1); }
+        .accordion-item.open .accordion-content { display: block; }
+
+        /* Controls & Buttons */
+        .btn-action { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; white-space: nowrap; }
+        .btn-action:hover { background: #4f46e5; transform: translateY(-1px); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-glow); color: white; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+        
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-success { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
+        .badge-info { background: rgba(6, 182, 212, 0.12); color: var(--accent); }
+
+        .ai-bar { padding: 20px; border-left: 4px solid var(--secondary); margin-bottom: 32px; background: linear-gradient(90deg, rgba(217,70,239,0.05) 0%, transparent 100%); }
+
+        /* Form styling inside sweetalert */
+        .swal-field { width: 100%; padding: 12px; margin-bottom: 14px; background: #11131e !important; border: 1px solid var(--border-glow) !important; border-radius: 8px !important; color: white !important; font-size: 0.95rem; }
+        select.swal-field { appearance: auto; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Authentication Shield Overlay -->
+    <div id="auth-container">
+        <div class="glass" style="width: 420px; padding: 48px; text-align: center;">
+            <div class="logo" style="justify-content: center; margin-bottom: 12px; font-size: 1.8rem;"><i class="fa-solid fa-circle-nodes"></i> EduTrack Pro</div>
+            <p style="color: var(--text-muted); margin-bottom: 36px; font-size: 0.95rem;">Administrative Access Console</p>
+            <form id="login-form">
+                <input type="text" id="username" class="swal-field" placeholder="Access Username" value="admin" required>
+                <input type="password" id="password" class="swal-field" placeholder="Security Token Key" value="password" required>
+                <button type="submit" class="btn-action" style="width: 100%; justify-content: center; margin-top: 12px;">Verify & Establish Session</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Central Application Hub -->
+    <div id="app-container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fa-solid fa-circle-nodes"></i> EduTrack Pro</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" id="link-dashboard" class="active" onclick="switchRoute('dashboard')"><i class="fa-solid fa-chart-network"></i> Control Panel</a></li>
+                <li class="nav-item"><a href="#" id="link-courses" onclick="switchRoute('courses')"><i class="fa-solid fa-folder-open"></i> Matrix & Syllabus</a></li>
+                <li class="nav-item"><a href="#" id="link-students" onclick="switchRoute('students')"><i class="fa-solid fa-graduation-cap"></i> Student Profiles</a></li>
+                <li class="nav-item"><a href="#" id="link-tests" onclick="switchRoute('tests')"><i class="fa-solid fa-file-signature"></i> Assessments (Tests)</a></li>
+                <li class="nav-item"><a href="#" id="link-worksheets" onclick="switchRoute('worksheets')"><i class="fa-solid fa-scroll"></i> Physical Worksheets</a></li>
+                <li class="nav-item"><a href="#" id="link-attendance" onclick="switchRoute('attendance')"><i class="fa-solid fa-calendar-check"></i> Attendance Matrix</a></li>
+            </ul>
+            <div class="glass" style="padding: 16px; margin-top: auto; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
+                <div style="flex-grow: 1;">
+                    <p style="font-size: 0.85rem; font-weight: 600;">Director Mode</p>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">Syncing Enabled</p>
+                </div>
+                <i class="fa-solid fa-power-off" style="color: var(--danger); cursor: pointer;" onclick="terminateSession()"></i>
+            </div>
+        </aside>
+
+        <main class="workspace">
+            <header class="header">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="global-search" oninput="runGlobalFilter()" placeholder="Instant lookup engine...">
+                </div>
+                <div>
+                    <button class="btn-action btn-secondary" onclick="pullDataPipeline()"><i class="fa-solid fa-cloud-arrow-down"></i> Sync Database</button>
+                </div>
+            </header>
+
+            <!-- Dashboard Control Panel -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="dashboard-grid">
+                    <div class="kpi-card glass">
+                        <h4>Total Active Students</h4>
+                        <div class="value" id="kpi-students">0</div>
+                    </div>
+                    <div class="kpi-card glass">
+                        <h4>Curriculum Tracks</h4>
+                        <div class="value" id="kpi-courses">0</div>
+                    </div>
+                    <div class="kpi-card glass">
+                        <h4>Pending Worksheets</h4>
+                        <div class="value" id="kpi-worksheets">0</div>
+                    </div>
+                    <div class="kpi-card glass">
+                        <h4>Avg Test Score</h4>
+                        <div class="value" id="kpi-avg">0%</div>
+                    </div>
+                </div>
+
+                <div class="ai-bar glass">
+                    <h5 style="color: var(--secondary); margin-bottom: 6px;"><i class="fa-solid fa-brain-circuit"></i> AI Diagnostic Engine</h5>
+                    <p id="ai-insight-text" style="font-size: 0.9rem; color: var(--text-muted);">Synthesizing cloud dataset values...</p>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-box glass">
+                        <h4 style="margin-bottom: 20px;">Performance Matrices Over Time</h4>
+                        <div style="position: relative; flex-grow: 1;"><canvas id="mainTrendChart"></canvas></div>
+                    </div>
+                    <div class="chart-box glass">
+                        <h4 style="margin-bottom: 20px;">Syllabus Status Tracking</h4>
+                        <div style="position: relative; flex-grow: 1;"><canvas id="distributionPieChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Matrix & Syllabus Configuration -->
+            <section id="view-courses" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h2>Matrix & Curriculums</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Course structures and live chapter milestones.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn-action btn-secondary" onclick="triggerCourseModal()"><i class="fa-solid fa-plus"></i> Add Course</button>
+                        <button class="btn-action" onclick="triggerSyllabusModal()"><i class="fa-solid fa-plus"></i> Append Milestone</button>
+                    </div>
+                </div>
+                <div id="syllabus-accordion-container"></div>
+            </section>
+
+            <!-- Student Profile Registers -->
+            <section id="view-students" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h2>Student Directory</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Complete access records and dynamic performance statuses.</p>
+                    </div>
+                    <button class="btn-action" onclick="triggerStudentModal()"><i class="fa-solid fa-user-plus"></i> Onboard Student</button>
+                </div>
+                <div class="table-card glass">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>UID</th>
+                                    <th>Name</th>
+                                    <th>Roll Num</th>
+                                    <th>Assigned Course</th>
+                                    <th>Contact Context</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-view"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Tests & Assessments Management -->
+            <section id="view-tests" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h2>Assessments & Form Results</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Track all formal tests, automated forms, and scoring.</p>
+                    </div>
+                    <button class="btn-action" onclick="triggerTestModal()"><i class="fa-solid fa-square-poll-vertical"></i> Log Test Score</button>
+                </div>
+                <div class="table-card glass">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Test ID</th>
+                                    <th>Student Context</th>
+                                    <th>Test Module</th>
+                                    <th>Date Taken</th>
+                                    <th>Score Ratio</th>
+                                    <th>Performance</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tests-table-view"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Physical Worksheets Management -->
+            <section id="view-worksheets" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h2>Physical Worksheets Ledger</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Track paper assignments distribution, checks, and scoring workflows.</p>
+                    </div>
+                    <button class="btn-action" onclick="triggerAssignWorksheetModal()"><i class="fa-solid fa-paper-plane"></i> Issue Assignment</button>
+                </div>
+                <div class="table-card glass">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Worksheet ID</th>
+                                    <th>Student Context</th>
+                                    <th>Target Chapter/Topic</th>
+                                    <th>Verification State</th>
+                                    <th>Score Metric</th>
+                                    <th style="text-align: right;">State Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="worksheet-table-view"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Attendance Tracker -->
+            <section id="view-attendance" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h2>Daily Attendance Matrix</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Monitor daily presence and physical center check-ins.</p>
+                    </div>
+                    <button class="btn-action" onclick="triggerAttendanceModal()"><i class="fa-solid fa-user-check"></i> Mark Attendance</button>
+                </div>
+                <div class="table-card glass">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course Matrix</th>
+                                    <th>Presence Status</th>
+                                    <th style="text-align: right;">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-view"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Script Execution Layer -->
+    <script>
+        // CONFIGURATION: Set your App Script deployment URL here
+        const WEB_API_ENDPOINT = "https://script.google.com/macros/s/AKfycbyW7EKvtYM-qetf4-6r_JXn-mu5ZQDJuNW7JSJ-WAUlttrinHqqJZTx41yp_3KqJC1Y/exec";
+
+        // Global Application Runtime State
+        let store = {
+            Students: [], Courses: [], Syllabus: [], Tests: [], Worksheets: [], Attendance: []
+        };
+
+        let trendChartRef = null;
+        let pieChartRef = null;
+
+        // Login Logic
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if(document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'password') {
+                document.getElementById('auth-container').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('auth-container').style.display = 'none';
+                    const app = document.getElementById('app-container');
+                    app.style.display = 'flex';
+                    setTimeout(() => { app.style.opacity = '1'; }, 50);
+                    bootRuntimeEngine();
+                }, 400);
+            } else {
+                Swal.fire({ icon: 'error', title: 'Security Denial', text: 'Invalid administrative credential profiles specified.', background: '#11131e', color: '#fff', confirmButtonColor: '#6366f1' });
+            }
+        });
+
+        function terminateSession() { window.location.reload(); }
+
+        // Navigation Router
+        function switchRoute(routeId) {
+            document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            
+            const targetedLink = document.getElementById(`link-${routeId}`);
+            if (targetedLink) targetedLink.classList.add('active');
+            
+            const targetedSection = document.getElementById(`view-${routeId}`);
+            if (targetedSection) targetedSection.classList.add('active');
+        }
+
+        // Initialize App & Fetch Data
+        function bootRuntimeEngine() {
+            const cachedData = localStorage.getItem('edutrack_cache');
+            if(cachedData) {
+                store = JSON.parse(cachedData);
+                renderAllViews();
+            }
+            pullDataPipeline();
+        }
+
+        // Fetch Read
+        async function pullDataPipeline() {
+            if(WEB_API_ENDPOINT.includes("YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+                loadMockSeedData(); // Load dummy data if URL not set
+                renderAllViews();
+                return;
+            }
+            try {
+                const response = await fetch(`${WEB_API_ENDPOINT}?action=readAll`);
+                const payload = await response.json();
+                if(payload.status === "success" && payload.data) {
+                    store = payload.data;
+                    localStorage.setItem('edutrack_cache', JSON.stringify(store));
+                    renderAllViews();
+                }
+            } catch (err) {
+                console.error("Pipeline Sync Interrupted: ", err);
+            }
+        }
+
+        // Database Write Committer
+        async function dispatchWriteAction(targetSheet, action, data) {
+            if(WEB_API_ENDPOINT.includes("YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+                // Mock behavior if no script URL is present
+                if(action === 'create') store[targetSheet].push(data);
+                if(action === 'update') {
+                    const pk = Object.keys(data)[0];
+                    store[targetSheet] = store[targetSheet].map(row => row[pk] === data[pk] ? {...row, ...data} : row);
+                }
+                if(action === 'delete') {
+                    const pk = Object.keys(store[targetSheet][0])[0];
+                    store[targetSheet] = store[targetSheet].filter(row => row[pk] !== data.id);
+                }
+                localStorage.setItem('edutrack_cache', JSON.stringify(store));
+                renderAllViews();
+                return true;
+            }
+
+            Swal.fire({ title: 'Processing DB Operation...', background: '#11131e', color: '#fff', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const resp = await fetch(WEB_API_ENDPOINT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, targetSheet, data })
+                });
+                Swal.close();
+                pullDataPipeline(); // Re-fetch updated data
+                return true;
+            } catch(e) {
+                Swal.fire({ icon: 'error', title: 'Data Committment Error', text: e.message, background: '#11131e', color: '#fff' });
+                return false;
+            }
+        }
+
+        // --- MASTER RENDERER ---
+        function renderAllViews() {
+            calculateKPIs();
+            renderStudentsTable();
+            renderSyllabusAccordion();
+            renderWorksheetsLedger();
+            renderTestsTable();
+            renderAttendanceTable();
+            generateCharts();
+        }
+
+        // --- DASHBOARD LOGIC ---
+        function calculateKPIs() {
+            document.getElementById('kpi-students').innerText = store.Students.length;
+            document.getElementById('kpi-courses').innerText = store.Courses.length;
+            
+            const pendingWS = store.Worksheets.filter(w => w.Status === 'Pending' || w.Status === 'Given').length;
+            document.getElementById('kpi-worksheets').innerText = pendingWS;
+
+            // Dynamically calculate average test scores
+            let validTests = store.Tests.filter(t => t.Percentage !== undefined && t.Percentage !== "");
+            let avgScore = 0;
+            if(validTests.length > 0) {
+                let total = validTests.reduce((sum, t) => sum + parseFloat(t.Percentage), 0);
+                avgScore = Math.round(total / validTests.length);
+            }
+            document.getElementById('kpi-avg').innerText = `${avgScore}%`;
+
+            // Smart Insights Engine
+            const aiText = document.getElementById('ai-insight-text');
+            if (pendingWS > 2) {
+                aiText.innerText = `Alert: Pipeline detects ${pendingWS} pending physical assignments. Recommend processing checks immediately.`;
+            } else if (avgScore < 60 && validTests.length > 0) {
+                aiText.innerText = `Warning: General test average is critically low (${avgScore}%). Consider revising recent complex syllabus modules.`;
+            } else {
+                aiText.innerText = `Optimization Target clear. Curriculum modules show steady advancement speeds across all tracks.`;
+            }
+        }
+
+        // --- RENDER TABLES ---
+        function renderStudentsTable() {
+            const target = document.getElementById('student-table-view');
+            target.innerHTML = '';
+            if(!store.Students.length) { target.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No student records.</td></tr>`; return; }
+            store.Students.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span style="font-family:monospace; color:var(--accent); font-weight:600;">${s.StudentID}</span></td>
+                    <td><strong>${s.Name}</strong></td>
+                    <td>${s.RollNumber}</td>
+                    <td><span class="badge badge-info">${s.Course}</span></td>
+                    <td><div>${s.ParentName}</div><div style="font-size:0.75rem; color:var(--text-muted);">${s.Phone}</div></td>
+                    <td style="text-align: right;">
+                        <button class="btn-action btn-secondary" style="padding: 6px 12px;" onclick="deleteRecord('Students', '${s.StudentID}')"><i class="fa-solid fa-trash-can" style="color:var(--danger)"></i></button>
+                    </td>
+                `;
+                target.appendChild(tr);
+            });
+        }
+
+        function renderTestsTable() {
+            const target = document.getElementById('tests-table-view');
+            target.innerHTML = '';
+            if(!store.Tests.length) { target.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No assessments recorded yet.</td></tr>`; return; }
+            store.Tests.forEach(t => {
+                const targetStudent = store.Students.find(s => s.StudentID === t.StudentID) || { Name: "Unknown" };
+                let perc = parseFloat(t.Percentage);
+                let badgeClass = perc >= 80 ? 'badge-success' : (perc >= 50 ? 'badge-warning' : 'badge-danger');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span style="font-family:monospace;">${t.TestID}</span></td>
+                    <td><strong>${targetStudent.Name}</strong><div style="font-size:0.75rem; color:var(--text-muted);">ID: ${t.StudentID}</div></td>
+                    <td><div>${t.TestName}</div><div style="font-size:0.75rem; color:var(--text-muted);">${t.Chapter}</div></td>
+                    <td>${t.Date}</td>
+                    <td><span style="font-weight:600;">${t.Marks} / ${t.TotalMarks}</span></td>
+                    <td><span class="badge ${badgeClass}">${t.Percentage}%</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn-action btn-secondary" style="padding: 6px 12px;" onclick="deleteRecord('Tests', '${t.TestID}')"><i class="fa-solid fa-trash-can" style="color:var(--danger)"></i></button>
+                    </td>
+                `;
+                target.appendChild(tr);
+            });
+        }
+
+        function renderAttendanceTable() {
+            const target = document.getElementById('attendance-table-view');
+            target.innerHTML = '';
+            if(!store.Attendance.length) { target.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No attendance records found.</td></tr>`; return; }
+            store.Attendance.forEach(a => {
+                const targetStudent = store.Students.find(s => s.StudentID === a.StudentID) || { Name: "Unknown", Course: "Unknown" };
+                let statusBadge = a.Status === 'Present' ? `<span class="badge badge-success">Present</span>` : `<span class="badge badge-danger">${a.Status}</span>`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${a.Date}</strong></td>
+                    <td><span style="font-family:monospace; color:var(--accent);">${a.StudentID}</span></td>
+                    <td>${targetStudent.Name}</td>
+                    <td>${targetStudent.Course}</td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: right;">
+                        <button class="btn-action btn-secondary" style="padding: 6px 12px;" onclick="deleteRecord('Attendance', '${a.StudentID}')"><i class="fa-solid fa-trash-can" style="color:var(--danger)"></i></button>
+                    </td>
+                `;
+                target.appendChild(tr);
+            });
+        }
+
+        function renderWorksheetsLedger() {
+            const target = document.getElementById('worksheet-table-view');
+            target.innerHTML = '';
+            if(!store.Worksheets.length) { target.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No managed physical assignments on track.</td></tr>`; return; }
+
+            store.Worksheets.forEach(w => {
+                const targetStudent = store.Students.find(s => s.StudentID === w.StudentID) || { Name: "Unknown Identity" };
+                let stateBadge = `<span class="badge badge-warning">${w.Status}</span>`;
+                if(w.Status === 'Checked') stateBadge = `<span class="badge badge-success">Verified</span>`;
+                if(w.Status === 'Submitted') stateBadge = `<span class="badge badge-info">Submitted</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span style="font-family:monospace;">${w.WorksheetID}</span></td>
+                    <td><strong>${targetStudent.Name}</strong></td>
+                    <td><div>${w.Chapter}</div><div style="font-size:0.75rem; color:var(--text-muted);">${w.Topic}</div></td>
+                    <td>${stateBadge}</td>
+                    <td><span style="font-weight:600;">${w.Marks || 'Unassigned'}</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn-action btn-secondary" style="padding:6px 12px;" onclick="triggerUpdateWorksheetModal('${w.WorksheetID}')"><i class="fa-solid fa-file-signature"></i> Process</button>
+                    </td>
+                `;
+                target.appendChild(tr);
+            });
+        }
+
+        function renderSyllabusAccordion() {
+            const container = document.getElementById('syllabus-accordion-container');
+            container.innerHTML = '';
+            if (!store.Courses.length) { container.innerHTML = `<div class="glass" style="padding:40px; text-align:center; color:var(--text-muted);">No matrix tracks specified.</div>`; return; }
+
+            store.Courses.forEach(c => {
+                const courseMilestones = store.Syllabus.filter(s => s.CourseID === c.CourseID);
+                const item = document.createElement('div');
+                item.className = 'accordion-item glass';
+                let milestoneRows = '';
+                courseMilestones.forEach(m => {
+                    milestoneRows += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-glow); padding:12px 0;">
+                            <div><span style="font-weight:600;">${m.Chapter}</span> - <span style="color:var(--text-muted);">${m.Topic}</span></div>
+                            <div><span class="badge badge-success">${m.Status || 'Active'}</span><span style="margin-left:14px; font-size:0.8rem; color:var(--text-muted); font-family:monospace;">Diff: ${m.Difficulty}</span></div>
+                        </div>`;
+                });
+                item.innerHTML = `
+                    <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div>
+                            <h3 style="font-size:1.1rem; font-weight:600;">${c.CourseName} <span style="font-size:0.8rem; color:var(--text-muted); font-weight:400; margin-left:10px;">${c.Subject}</span></h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">In-Charge Leader: ${c.Teacher}</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" style="color:var(--text-muted)"></i>
+                    </div>
+                    <div class="accordion-content">${milestoneRows || '<p style="color:var(--text-muted); font-size:0.9rem;">No module tracks added to this syllabus vector.</p>'}</div>`;
+                container.appendChild(item);
+            });
+        }
+
+        // --- MODALS & FORMS ---
+        function triggerTestModal() {
+            // Build student dropdown options
+            let studentOptions = store.Students.map(s => `<option value="${s.StudentID}">${s.Name} (${s.StudentID})</option>`).join('');
+
+            Swal.fire({
+                title: 'Log Test Assessment',
+                background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `
+                    <input id="t-id" class="swal-field" placeholder="Test ID (e.g. T-101)">
+                    <select id="t-sid" class="swal-field"><option value="">Select Student...</option>${studentOptions}</select>
+                    <input id="t-name" class="swal-field" placeholder="Test Name (e.g. Mid-Term Math)">
+                    <input id="t-chap" class="swal-field" placeholder="Chapter/Module Focus">
+                    <div style="display:flex; gap:10px;">
+                        <input id="t-marks" class="swal-field" type="number" placeholder="Marks Scored">
+                        <input id="t-total" class="swal-field" type="number" placeholder="Total Marks">
+                    </div>
+                    <input id="t-date" class="swal-field" type="date">
+                `,
+                preConfirm: () => {
+                    const marks = parseFloat(document.getElementById('t-marks').value);
+                    const total = parseFloat(document.getElementById('t-total').value);
+                    const percentage = total > 0 ? ((marks / total) * 100).toFixed(1) : 0;
+                    const studentId = document.getElementById('t-sid').value;
+                    const targetStudent = store.Students.find(s => s.StudentID === studentId) || {};
+
+                    return {
+                        TestID: document.getElementById('t-id').value,
+                        StudentID: studentId,
+                        RollNumber: targetStudent.RollNumber || "N/A",
+                        TestName: document.getElementById('t-name').value,
+                        Course: targetStudent.Course || "General",
+                        Chapter: document.getElementById('t-chap').value,
+                        Marks: marks,
+                        TotalMarks: total,
+                        Percentage: percentage,
+                        Date: document.getElementById('t-date').value
+                    }
+                }
+            }).then(result => {
+                if(result.isConfirmed) dispatchWriteAction('Tests', 'create', result.value);
+            });
+        }
+
+        function triggerAttendanceModal() {
+            let studentOptions = store.Students.map(s => `<option value="${s.StudentID}">${s.Name} (${s.StudentID})</option>`).join('');
+            
+            // Default date to today
+            let today = new Date().toISOString().split('T')[0];
+
+            Swal.fire({
+                title: 'Mark Daily Attendance',
+                background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `
+                    <input id="a-date" class="swal-field" type="date" value="${today}">
+                    <select id="a-sid" class="swal-field"><option value="">Select Student...</option>${studentOptions}</select>
+                    <select id="a-status" class="swal-field">
+                        <option value="Present">🟢 Present</option>
+                        <option value="Absent">🔴 Absent</option>
+                        <option value="Late">🟡 Late</option>
+                        <option value="Leave">⚪ On Leave</option>
+                    </select>
+                `,
+                preConfirm: () => {
+                    return {
+                        StudentID: document.getElementById('a-sid').value,
+                        Date: document.getElementById('a-date').value,
+                        Status: document.getElementById('a-status').value
+                    }
+                }
+            }).then(result => {
+                if(result.isConfirmed) dispatchWriteAction('Attendance', 'create', result.value);
+            });
+        }
+
+        // Remaining Modal Triggers...
+        function triggerStudentModal() {
+            Swal.fire({
+                title: 'Onboard Student Profile', background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `<input id="stu-id" class="swal-field" placeholder="Unique Student ID (e.g., STU-101)">
+                       <input id="stu-name" class="swal-field" placeholder="Full Student Name">
+                       <input id="stu-roll" class="swal-field" placeholder="Class Roll Number">
+                       <input id="stu-course" class="swal-field" placeholder="Assigned Matrix Course Target">
+                       <input id="stu-parent" class="swal-field" placeholder="Primary Guardian Name">
+                       <input id="stu-phone" class="swal-field" placeholder="Authorized Contact Phone">`,
+                preConfirm: () => { return { StudentID: document.getElementById('stu-id').value, Name: document.getElementById('stu-name').value, RollNumber: document.getElementById('stu-roll').value, Course: document.getElementById('stu-course').value, ParentName: document.getElementById('stu-parent').value, Phone: document.getElementById('stu-phone').value } }
+            }).then(result => { if(result.isConfirmed) dispatchWriteAction('Students', 'create', result.value); });
+        }
+
+        function triggerCourseModal() {
+            Swal.fire({
+                title: 'Construct Matrix Path', background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `<input id="c-id" class="swal-field" placeholder="Course ID Route">
+                       <input id="c-name" class="swal-field" placeholder="Course Destination Nomenclature">
+                       <input id="c-sub" class="swal-field" placeholder="Subject Focus Variant">
+                       <input id="c-teach" class="swal-field" placeholder="Lead Instructor Anchor">`,
+                preConfirm: () => { return { CourseID: document.getElementById('c-id').value, CourseName: document.getElementById('c-name').value, Subject: document.getElementById('c-sub').value, Teacher: document.getElementById('c-teach').value } }
+            }).then(result => { if(result.isConfirmed) dispatchWriteAction('Courses', 'create', result.value); });
+        }
+
+        function triggerSyllabusModal() {
+            Swal.fire({
+                title: 'Append Track Milestone', background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `<input id="s-cid" class="swal-field" placeholder="Target Course ID Link">
+                       <input id="s-chap" class="swal-field" placeholder="Chapter Heading Reference">
+                       <input id="s-top" class="swal-field" placeholder="Topic Parameter Mapping">
+                       <input id="s-diff" class="swal-field" placeholder="Difficulty Value Index">`,
+                preConfirm: () => { return { CourseID: document.getElementById('s-cid').value, Chapter: document.getElementById('s-chap').value, Topic: document.getElementById('s-top').value, Difficulty: document.getElementById('s-diff').value, Status: 'Active' } }
+            }).then(result => { if(result.isConfirmed) dispatchWriteAction('Syllabus', 'create', result.value); });
+        }
+
+        function triggerAssignWorksheetModal() {
+            Swal.fire({
+                title: 'Issue Physical Assignment', background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `<input id="w-id" class="swal-field" placeholder="Unique Worksheet Barcode Token ID">
+                       <input id="w-sid" class="swal-field" placeholder="Target Student ID Link">
+                       <input id="w-chap" class="swal-field" placeholder="Chapter Subject Matter">
+                       <input id="w-top" class="swal-field" placeholder="Topic Target Designation">`,
+                preConfirm: () => { return { WorksheetID: document.getElementById('w-id').value, StudentID: document.getElementById('w-sid').value, Chapter: document.getElementById('w-chap').value, Topic: document.getElementById('w-top').value, Status: 'Given', Marks: '' } }
+            }).then(result => { if(result.isConfirmed) dispatchWriteAction('Worksheets', 'create', result.value); });
+        }
+
+        function triggerUpdateWorksheetModal(worksheetId) {
+            const currentWS = store.Worksheets.find(w => w.WorksheetID === worksheetId);
+            if(!currentWS) return;
+            Swal.fire({
+                title: 'Process Checkpoint Validation', background: '#090a10', color: '#fff', confirmButtonColor: '#6366f1',
+                html: `<p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Modifying Record Verification Path Token ${worksheetId}</p>
+                       <select id="w-status" class="swal-field" style="height:48px;">
+                           <option value="Given" ${currentWS.Status === 'Given' ? 'selected' : ''}>Issued (Given)</option>
+                           <option value="Submitted" ${currentWS.Status === 'Submitted' ? 'selected' : ''}>Awaiting Verification (Submitted)</option>
+                           <option value="Checked" ${currentWS.Status === 'Checked' ? 'selected' : ''}>Verified and Finalized (Checked)</option>
+                       </select>
+                       <input id="w-marks" class="swal-field" placeholder="Score Rating Metric Allocation" value="${currentWS.Marks || ''}">`,
+                preConfirm: () => { return { ...currentWS, Status: document.getElementById('w-status').value, Marks: document.getElementById('w-marks').value } }
+            }).then(result => { if(result.isConfirmed) dispatchWriteAction('Worksheets', 'update', result.value); });
+        }
+
+        // Generic Delete Dispatcher
+        function deleteRecord(sheetName, id) {
+            Swal.fire({
+                title: 'Confirm Deletion?', text: "This action irreversibly destroys the database record link.", icon: 'warning', showCancelButton: true, background: '#090a10', color: '#fff', confirmButtonColor: '#ef4444', cancelButtonColor: 'transparent'
+            }).then(res => { if(res.isConfirmed) dispatchWriteAction(sheetName, 'delete', { id }); });
+        }
+
+        // Global Search
+        function runGlobalFilter() {
+            const pattern = document.getElementById('global-search').value.toLowerCase();
+            const activeSection = document.querySelector('.view-section.active').id;
+            const targetTableIds = {
+                'view-students': 'student-table-view',
+                'view-worksheets': 'worksheet-table-view',
+                'view-tests': 'tests-table-view',
+                'view-attendance': 'attendance-table-view'
+            };
+            if(targetTableIds[activeSection]) {
+                const rows = document.querySelectorAll(`#${targetTableIds[activeSection]} tr`);
+                rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(pattern) ? '' : 'none'; });
+            }
+        }
+
+        // Chart Visualizers
+        function generateCharts() {
+            Chart.defaults.color = 'rgba(255, 255, 255, 0.4)'; Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            if (trendChartRef) trendChartRef.destroy(); if (pieChartRef) pieChartRef.destroy();
+
+            // Dynamic Trend logic mapping test scores
+            let labels = ['No Data']; let dataPoints = [0];
+            if(store.Tests.length > 0) {
+                // Group by latest dates up to 5
+                let recentTests = store.Tests.slice(-5);
+                labels = recentTests.map(t => t.TestName.substring(0, 8) + '...');
+                dataPoints = recentTests.map(t => parseFloat(t.Percentage));
+            }
+
+            const trendCanvas = document.getElementById('mainTrendChart');
+            if(trendCanvas) {
+                trendChartRef = new Chart(trendCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: labels, datasets: [{ label: 'Recent Test Scores %', data: dataPoints, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.05)', borderWidth: 3, tension: 0.35, fill: true }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            const pieCanvas = document.getElementById('distributionPieChart');
+            if(pieCanvas) {
+                const finished = store.Worksheets.filter(w => w.Status === 'Checked').length || 1;
+                const process = store.Worksheets.filter(w => w.Status !== 'Checked').length || 1;
+                pieChartRef = new Chart(pieCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: ['Verified Tracking', 'Pending Processing Pipeline'], datasets: [{ data: [finished, process], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '78%' }
+                });
+            }
+        }
+
+        // Mock Data for local testing (No Apps Script API)
+        function loadMockSeedData() {
+            console.warn("Running in Client Simulation Mode. No Apps Script Web URL provided.");
+            store = {
+                Students: [
+                    { StudentID: "STU-801", Name: "Elena Rostova", RollNumber: "01", Course: "6th Class Advanced", ParentName: "Mikhail Rostov", Phone: "+1 415 801 9283" },
+                    { StudentID: "STU-802", Name: "Julian Alvarez", RollNumber: "14", Course: "Abacus Logic Master", ParentName: "S. Alvarez", Phone: "+1 650 204 1192" }
+                ],
+                Courses: [
+                    { CourseID: "C-6A", CourseName: "6th Class Advanced", Subject: "Mathematics Framework", Teacher: "Prof. Sarah Vance" },
+                    { CourseID: "C-AB", CourseName: "Abacus Logic Master", Subject: "Mental Math Dynamics", Teacher: "Master Kenji Sato" }
+                ],
+                Syllabus: [
+                    { CourseID: "C-6A", Chapter: "Ch-1 Complex Numbers", Topic: "Rational Value Bounds", Difficulty: "High", Status: "Verified" }
+                ],
+                Tests: [
+                    { TestID: "T-001", StudentID: "STU-801", RollNumber: "01", TestName: "Mid-Term Maths", Course: "6th Class Advanced", Chapter: "Ch-1 Complex Numbers", Marks: 85, TotalMarks: 100, Percentage: 85.0, Date: "2026-05-24" },
+                    { TestID: "T-002", StudentID: "STU-802", RollNumber: "14", TestName: "Speed Test V1", Course: "Abacus Logic Master", Chapter: "Visualization", Marks: 45, TotalMarks: 50, Percentage: 90.0, Date: "2026-05-25" }
+                ],
+                Worksheets: [
+                    { WorksheetID: "WS-909", StudentID: "STU-801", Course: "6th Class Advanced", Chapter: "Ch-1 Complex Numbers", Topic: "Rational Value Bounds", Status: "Given", Marks: "" }
+                ],
+                Attendance: [
+                    { StudentID: "STU-801", Date: "2026-05-26", Status: "Present" },
+                    { StudentID: "STU-802", Date: "2026-05-26", Status: "Absent" }
+                ]
+            };
+        }
+    </script>
+</body>
+</html>
